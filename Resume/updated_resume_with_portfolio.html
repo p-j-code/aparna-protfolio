@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aparna Munagekar - Resume</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        line-height: 1.4;
+        color: #2c3e50;
+        background: white;
+        font-size: 10pt;
+      }
+
+      .container {
+        max-width: 8.5in;
+        min-height: 11in;
+        margin: 0 auto;
+        padding: 0.4in 0.5in;
+        background: white;
+        position: relative;
+      }
+
+      /* Subtle gradient background accent */
+      .container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 120px;
+        background: linear-gradient(
+          135deg,
+          rgba(168, 85, 247, 0.03) 0%,
+          rgba(236, 72, 153, 0.03) 100%
+        );
+        z-index: 0;
+      }
+
+      /* Header Section */
+      header {
+        text-align: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        position: relative;
+        z-index: 1;
+      }
+
+      h1 {
+        font-size: 26pt;
+        font-weight: 700;
+        background: linear-gradient(135deg, #9333ea 0%, #ec4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 4px;
+        letter-spacing: -0.5px;
+      }
+
+      .tagline {
+        font-size: 11pt;
+        color: #555;
+        font-weight: 500;
+        margin-bottom: 6px;
+      }
+
+      .contact-info {
+        font-size: 9.5pt;
+        color: #555;
+        margin-top: 5px;
+      }
+
+      .contact-info span {
+        margin: 0 5px;
+      }
+
+      .contact-info a {
+        color: #9333ea;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+
+      .contact-info a:hover {
+        color: #ec4899;
+      }
+
+      /* Header border with gradient */
+      .header-border {
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          #9333ea 0%,
+          #ec4899 50%,
+          #9333ea 100%
+        );
+        margin-top: 10px;
+      }
+
+      /* Section Styling */
+      section {
+        margin-bottom: 12px;
+        position: relative;
+        z-index: 1;
+      }
+
+      h2 {
+        font-size: 12pt;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 6px;
+        padding-bottom: 3px;
+        border-bottom: 1.5px solid;
+        border-image: linear-gradient(90deg, #9333ea 0%, transparent 100%) 1;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      h3 {
+        font-size: 11pt;
+        font-weight: 600;
+        color: #34495e;
+        margin-bottom: 2px;
+      }
+
+      .job-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 4px;
+      }
+
+      .company {
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 10pt;
+      }
+
+      .date {
+        font-size: 9pt;
+        color: #7f8c8d;
+        font-style: italic;
+      }
+
+      p {
+        margin-bottom: 5px;
+        text-align: justify;
+        font-size: 9.5pt;
+        line-height: 1.4;
+      }
+
+      ul {
+        margin-left: 18px;
+        margin-bottom: 5px;
+      }
+
+      li {
+        margin-bottom: 2px;
+        font-size: 9.5pt;
+        line-height: 1.35;
+      }
+
+      /* Custom bullet points */
+      ul li::marker {
+        color: #9333ea;
+      }
+
+      /* Two Column Layout for Skills */
+      .skills-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-top: 6px;
+      }
+
+      .skill-category {
+        margin-bottom: 5px;
+        padding: 8px;
+        background: linear-gradient(
+          135deg,
+          rgba(168, 85, 247, 0.02) 0%,
+          rgba(236, 72, 153, 0.02) 100%
+        );
+        border-radius: 6px;
+      }
+
+      .skill-category h4 {
+        font-size: 10pt;
+        font-weight: 600;
+        background: linear-gradient(135deg, #9333ea 0%, #ec4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 4px;
+      }
+
+      .skill-category ul {
+        margin-left: 15px;
+      }
+
+      .skill-category li {
+        font-size: 9pt;
+        margin-bottom: 1px;
+        line-height: 1.3;
+      }
+
+      /* Project Section */
+      .project {
+        margin-bottom: 8px;
+        padding-left: 8px;
+      }
+
+      .project h4 {
+        font-size: 10pt;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 3px;
+      }
+
+      .project ul {
+        margin-left: 15px;
+      }
+
+      .project li {
+        font-size: 9pt;
+        margin-bottom: 1px;
+      }
+
+      /* Education Grid */
+      .education-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+
+      .education-item {
+        padding: 8px;
+        background: linear-gradient(
+          135deg,
+          rgba(168, 85, 247, 0.02) 0%,
+          rgba(236, 72, 153, 0.02) 100%
+        );
+        border-radius: 6px;
+      }
+
+      .education-item h4 {
+        font-size: 10pt;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1px;
+      }
+
+      .education-item .institution {
+        font-size: 9pt;
+        color: #555;
+        line-height: 1.3;
+      }
+
+      .education-item .focus {
+        font-size: 8.5pt;
+        color: #7f8c8d;
+        font-style: italic;
+      }
+
+      /* Additional Info */
+      .additional-info {
+        background: linear-gradient(
+          135deg,
+          rgba(168, 85, 247, 0.05) 0%,
+          rgba(236, 72, 153, 0.05) 100%
+        );
+        padding: 10px 12px;
+        border-radius: 8px;
+        margin-top: 5px;
+        border: 1px solid rgba(147, 51, 234, 0.1);
+      }
+
+      .info-row {
+        margin-bottom: 3px;
+        font-size: 9pt;
+        line-height: 1.4;
+      }
+
+      .info-row strong {
+        color: #9333ea;
+        margin-right: 5px;
+        font-weight: 600;
+      }
+
+      /* Compact summary */
+      .summary {
+        font-size: 9.5pt;
+        line-height: 1.5;
+        margin-bottom: 0;
+        color: #34495e;
+      }
+
+      /* Highlight important text */
+      strong {
+        color: #9333ea;
+        font-weight: 600;
+      }
+
+      /* Print Optimization */
+      @media print {
+        body {
+          background: white;
+        }
+        .container {
+          padding: 0.3in 0.5in;
+          max-width: 100%;
+          min-height: auto;
+        }
+        .container::before {
+          display: none;
+        }
+        section {
+          page-break-inside: avoid;
+        }
+        h1 {
+          color: #2c3e50 !important;
+          -webkit-text-fill-color: #2c3e50 !important;
+        }
+        .skill-category h4 {
+          color: #2c3e50 !important;
+          -webkit-text-fill-color: #2c3e50 !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>APARNA MUNAGEKAR</h1>
+        <div class="tagline">
+          Graphic Designer | Packaging Design Specialist | Visual Storyteller
+        </div>
+        <div class="contact-info">
+          <span>Mumbai, Maharashtra, India</span> •
+          <span>+91 99870 37136</span> • <span>aparnamunagekar@gmail.com</span
+          ><br />
+          <a href="https://aparna-portfolio.vercel.app">Portfolio</a> •
+          <a href="https://linkedin.com/in/aparna-munagekar">LinkedIn</a> •
+          <a href="https://behance.net/aparnamunagekar1">Behance</a>
+        </div>
+        <div class="header-border"></div>
+      </header>
+
+      <section>
+        <h2>Professional Summary</h2>
+        <p class="summary">
+          Creative Graphic Designer with expertise in packaging design and brand
+          identity. Successfully designed packaging for major national brand
+          <strong>Nataraj Stationery</strong>, now in retail stores nationwide.
+          Skilled in creating designs that connect with target audiences while
+          maintaining brand consistency. Proficient in Adobe Creative Suite with
+          strong foundation in typography, illustration, and print production.
+        </p>
+      </section>
+
+      <section>
+        <h2>Professional Experience</h2>
+        <div class="job-title">
+          <div>
+            <h3>Graphic Designer</h3>
+            <span class="company">JUST DESIGN STUDIO — Mumbai</span>
+          </div>
+          <span class="date">Aug 2024 – Present</span>
+        </div>
+        <ul>
+          <li>
+            Designed complete packaging for
+            <strong>Nataraj 24 Colour Pencils</strong> featuring original
+            character illustrations, now in retail stores nationwide
+          </li>
+          <li>
+            Conceptualized and produced print-ready collateral for 10+ client
+            accounts across FMCG, retail, and education sectors
+          </li>
+          <li>
+            Led rebranding projects for 3 SMEs including logo redesign, brand
+            guidelines, and marketing collateral
+          </li>
+          <li>
+            Created sustainable packaging solutions contributing to 15% sales
+            uplift for retail client
+          </li>
+          <li>
+            Managed multiple projects simultaneously while meeting tight
+            deadlines and maintaining quality standards
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Key Projects & Achievements</h2>
+
+        <div class="project">
+          <h4>Major Brand Packaging - Nataraj Stationery (2024-2025)</h4>
+          <ul>
+            <li>
+              Designed complete product packaging for Nataraj 24 Colour Pencils
+              with vibrant character illustrations
+            </li>
+            <li>
+              Packaging successfully launched nationwide and featured in
+              official marketing campaigns
+            </li>
+          </ul>
+        </div>
+
+        <div class="project">
+          <h4>Publication & Environmental Design</h4>
+          <ul>
+            <li>
+              Illustrated children's book covers featured at
+              <strong>2025 Mumbai Book Fair</strong>
+            </li>
+            <li>
+              Created poster series for
+              <strong>World Environment Day 2025</strong> achieving 20,000+
+              organic shares
+            </li>
+            <li>
+              Completed logo redesigns for 3 SMEs, improving brand recognition
+              and market positioning
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2>Core Competencies</h2>
+        <div class="skills-grid">
+          <div class="skill-category">
+            <h4>Design Expertise</h4>
+            <ul>
+              <li>Packaging Design & Production</li>
+              <li>Brand Identity Development</li>
+              <li>Children's Product Design</li>
+              <li>Typography (Latin & Devanagari)</li>
+              <li>Publication & Book Cover Design</li>
+              <li>Logo Design & Illustration</li>
+            </ul>
+          </div>
+          <div class="skill-category">
+            <h4>Technical Skills</h4>
+            <ul>
+              <li>Adobe Illustrator (Advanced)</li>
+              <li>Adobe Photoshop (Advanced)</li>
+              <li>Adobe InDesign • Canva</li>
+              <li>Print Production & Pre-press</li>
+              <li>Color Management (CMYK/RGB)</li>
+              <li>Packaging Mockups & Die-lines</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Education</h2>
+        <div class="education-grid">
+          <div class="education-item">
+            <h4>Diploma in Applied Arts – Graphic Design</h4>
+            <div class="institution">
+              Sophia Shree B.K. Somani Memorial Polytechnic<br />Society for the
+              Higher Education of Women, Mumbai
+            </div>
+            <div class="focus">Focus: Typography, Publication Design</div>
+          </div>
+          <div class="education-item">
+            <h4>Higher Secondary Certificate (HSC) – Arts</h4>
+            <div class="institution">
+              Kirti M. Doongursee College of Arts,<br />Science & Commerce,
+              Mumbai
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="additional-info">
+          <div class="info-row">
+            <strong>Languages:</strong> English (Fluent) • Hindi (Fluent) •
+            Marathi (Native)
+          </div>
+          <div class="info-row">
+            <strong>Interests:</strong> Typography • Sustainable Packaging •
+            Children's Illustration • Visual Storytelling
+          </div>
+          <div class="info-row">
+            <strong>Online Presence:</strong> aparna-portfolio.vercel.app • 1.
+            behance.net/aparnamunagekar • 2. behance.net/aparnamunagekar1
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

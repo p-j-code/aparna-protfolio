@@ -29,6 +29,7 @@ Open [http://localhost:3000](http://localhost:3000)
 ## 📝 Updating Content
 
 Edit `src/data/portfolio-data.js` to update:
+
 - Personal information
 - Projects
 - Skills
@@ -38,11 +39,13 @@ Edit `src/data/portfolio-data.js` to update:
 ## 🌐 Deployment
 
 ### Vercel (Recommended)
+
 ```bash
 npm run deploy:vercel
 ```
 
 ### Netlify
+
 ```bash
 npm run deploy:netlify
 ```
@@ -63,4 +66,5 @@ npm run deploy:netlify
 ## 📄 License
 
 © 2025 Aparna Munagekar. All rights reserved.
+
 # aparna-protfolio
