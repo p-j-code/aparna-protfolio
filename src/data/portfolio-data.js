@@ -16,7 +16,7 @@ export const portfolioData = {
   about: {
     description: [
       "I'm a passionate Graphic Designer specializing in packaging design and visual storytelling. With a keen eye for detail and a love for vibrant, meaningful design, I create work that connects with audiences on an emotional level.",
-      "My recent work includes designing the complete packaging for Nataraj 24 Colour Pencils, now available in stores nationwide. I believe great design isn't just about aesthetics—it's about creating experiences that resonate with people.",
+      "My recent work includes designing the complete packaging for Nataraj Colour Pencils series (10, 12, and 24 colours), now available in stores nationwide. I believe great design isn't just about aesthetics—it's about creating experiences that resonate with people.",
     ],
     stats: [
       {
@@ -40,16 +40,22 @@ export const portfolioData = {
   projects: [
     {
       id: 1,
-      title: "Nataraj 24 Colour Pencils",
+      title: "Nataraj Colour Pencils Collection",
       category: "Packaging Design",
       description:
-        "Complete packaging design for national brand featuring vibrant character illustrations and child-friendly visuals",
+        "Complete packaging design series for national brand featuring vibrant character illustrations and child-friendly visuals",
       longDescription:
-        'Designed the complete product packaging for Nataraj 24 Colour Pencils, creating original character designs and illustrated scenes that appeal to children. The packaging emphasizes the product\'s "super smooth and bright colours" and is now available in retail stores nationwide.',
+        'Designed the complete product packaging for Nataraj Colour Pencils series (10, 12, and 24 colours), creating original character designs and illustrated scenes that appeal to children. The packaging emphasizes the product\'s "super smooth and bright colours" and is now available in retail stores nationwide.',
       tags: ["Packaging", "Illustration", "Brand Design"],
       stats: "Now in stores nationwide",
       featured: true,
-      images: ["/projects/24colorshs/img1.png"],
+      images: [
+        "/projects/color-pancels/img24-fs.png",
+        "/projects/color-pancels/img24.png",
+        "/projects/color-pancels/img10.png",
+        "/projects/color-pancels/img12-fs.png",
+        "/projects/color-pancels/img12.png",
+      ],
       color: "from-red-500 to-yellow-500",
     },
     {

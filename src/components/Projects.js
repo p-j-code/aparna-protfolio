@@ -135,14 +135,14 @@ export default function Projects() {
         />
 
         {/* Enhanced Content with glow effects and improved contrast */}
-        <div className="relative h-full flex flex-col items-center justify-center text-white">
+        <div className="relative h-full flex flex-col items-center justify-center text-purple-600">
           {/* Improved icon container with glow effect */}
-          <div className="bg-white/30 backdrop-blur-sm rounded-full p-6 mb-4 animate-bounce shadow-lg shadow-white/20 ring-4 ring-white/10">
+          <div className="bg-white/30 backdrop-blur-sm rounded-full p-6 mb-4 shadow-lg shadow-white/20 ring-4 ring-white/10">
             <div className="relative">
               {/* Creating a glow effect with pseudo-element */}
-              <div className="absolute inset-0 blur-md bg-white opacity-50 scale-110 rounded-full"></div>
+              <div className="absolute inset-0 blur-md text-purple-600 opacity-50 scale-110 rounded-full"></div>
               <Icon
-                className="w-12 h-12 relative z-10 text-white filter brightness-125"
+                className="w-12 h-12 relative z-10 text-purple-600 filter brightness-125"
                 style={{
                   filter: "drop-shadow(0 0 10px rgba(255, 255, 255, 0.8))",
                 }}
@@ -152,7 +152,6 @@ export default function Projects() {
           <h3 className="text-2xl font-bold mb-2 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]">
             {project.title}
           </h3>
-          <p className="text-white font-medium">{project.category}</p>
           {!showNoImagesMessage && (
             <div className="mt-3 px-4 py-2 bg-black/40 backdrop-blur-md rounded-lg border border-white/20">
               <p className="text-sm text-white">Image {index + 1}</p>
@@ -178,8 +177,9 @@ export default function Projects() {
             .map((project, index) => (
               <div
                 key={project.id}
-                className="group relative bg-white rounded-2xl shadow-xl overflow-hidden hover:scale-105 transition-all duration-500 animate-scale-in"
+                className="group cursor-pointer relative bg-white rounded-2xl shadow-xl overflow-hidden hover:scale-105 transition-all duration-500 animate-scale-in"
                 style={{ animationDelay: `${index * 100}ms` }}
+                onClick={() => setSelectedProject(project)}
               >
                 {/* Image Display - Card Preview with Error Handling */}
                 <div className="relative h-48 md:h-56 overflow-hidden">
@@ -270,10 +270,10 @@ export default function Projects() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header with close button */}
-            <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-200 p-4 flex justify-between items-center">
+            <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-gray-200 p-4 flex justify-between items-center">
               <div className="flex items-center gap-3">
                 <span
-                  className={`text-sm font-semibold text-white bg-gradient-to-r ${selectedProject.color} px-3 py-1 rounded-full`}
+                  className={`text-sm font-semibold text-purple-600 bg-gradient-to-r ${selectedProject.color} px-3 py-1 rounded-full`}
                 >
                   {selectedProject.category}
                 </span>
@@ -399,7 +399,7 @@ export default function Projects() {
               {/* Thumbnail Preview Strip - Only show if multiple images */}
               {selectedProject.images && selectedProject.images.length > 1 && (
                 <div className="px-4 py-4 bg-gradient-to-b from-gray-50 to-white border-t border-gray-200">
-                  <div className="flex gap-3 overflow-x-auto pb-2 px-2">
+                  <div className="flex gap-3 overflow-x-auto pt-6 pb-2 px-2">
                     {selectedProject.images.map((img, idx) => (
                       <button
                         key={idx}
