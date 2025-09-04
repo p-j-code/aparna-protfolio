@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { about } from '@/data/portfolio-data'
+import { about } from "@/data/portfolio-data";
 
 export default function About() {
   return (
@@ -11,12 +11,22 @@ export default function About() {
         </h2>
         <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 backdrop-blur-lg bg-opacity-90">
           {about.description.map((paragraph, index) => (
-            <p key={index} className="text-lg text-gray-700 leading-relaxed mb-6">
+            <p
+              key={index}
+              className="text-lg text-gray-700 leading-relaxed mb-6"
+            >
               {index === 1 && (
                 <>
-                  {paragraph.split('Nataraj 24 Colour Pencils')[0]}
-                  <span className="font-semibold text-purple-600">Nataraj 24 Colour Pencils</span>
-                  {paragraph.split('Nataraj 24 Colour Pencils')[1]}
+                  {
+                    paragraph.split(
+                      "Nataraj Colour Pencils series (10, 12, and 24 colours)"
+                    )[0]
+                  }
+                  {
+                    paragraph.split(
+                      "Nataraj Colour Pencils series (10, 12, and 24 colours)"
+                    )[1]
+                  }
                 </>
               )}
               {index !== 1 && paragraph}
@@ -35,5 +45,5 @@ export default function About() {
         </div>
       </div>
     </section>
-  )
+  );
 }

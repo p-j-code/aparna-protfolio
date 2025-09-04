@@ -2,7 +2,7 @@ import Head from "next/head";
 
 export default function SEO({
   title = "Aparna Munagekar - Creative Designer Portfolio",
-  description = "Packaging Designer & Visual Storyteller. Creator of Nataraj 24 Colour Pencils packaging.",
+  description = "Packaging Designer & Visual Storyteller. Creator of Nataraj Colour Pencils series (10, 12, and 24 colours) packaging.",
   image = "/og-image.jpg",
   url = process.env.NEXT_PUBLIC_SITE_URL ||
     "https://aparna-portfolio.vercel.app",

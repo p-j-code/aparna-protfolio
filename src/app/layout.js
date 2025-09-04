@@ -1,4 +1,4 @@
-import './globals.css'
+import "./globals.css";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata = {
   title: "Aparna Munagekar - Creative Designer Portfolio",
   description:
-    "Packaging Designer & Visual Storyteller. Creator of Nataraj 24 Colour Pencils packaging.",
+    "Packaging Designer & Visual Storyteller. Creator of Nataraj Colour Pencils series (10, 12, and 24 colours) packaging.",
   keywords:
     "graphic designer, packaging design, mumbai designer, nataraj, illustration",
   openGraph: {

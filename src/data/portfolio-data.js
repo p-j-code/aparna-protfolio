@@ -149,7 +149,7 @@ export const portfolioData = {
       location: "Mumbai",
       duration: "Aug 2024 – Present",
       responsibilities: [
-        "Designed complete packaging for Nataraj 24 Colour Pencils featuring original character illustrations",
+        "Designed complete packaging for Nataraj Colour Pencils series (10, 12, and 24 colours) featuring original character illustrations",
         "Conceptualized and produced print-ready collateral for 10+ client accounts",
         "Led rebranding projects for 3 SMEs including logo redesign and brand guidelines",
         "Created sustainable packaging solutions contributing to 15% sales uplift",
