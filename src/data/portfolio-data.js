@@ -5,7 +5,7 @@ export const portfolioData = {
     name: "Aparna Munagekar",
     title:
       "Graphic Designer | Packaging Design Specialist | Visual Storyteller",
-    email: "aparnamunagekar@gmail.com",
+    email: "helloaparnam@gmail.com",
     phone: "+91 99870 37136",
     location: "Mumbai, Maharashtra, India",
     linkedin: "https://linkedin.com/in/aparna-munagekar",
