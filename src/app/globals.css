@@ -7,16 +7,24 @@
     scroll-behavior: smooth;
   }
   
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
   body {
     @apply antialiased;
   }
 }
 
-@layer utilities {
+@layer components {
   .text-gradient {
     @apply bg-gradient-to-r from-purple-600 via-pink-600 to-red-500 bg-clip-text text-transparent;
   }
-  
+}
+
+@layer utilities {
   .animate-delay-100 {
     animation-delay: 100ms;
   }
