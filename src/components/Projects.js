@@ -114,34 +114,49 @@ export default function Projects() {
     const icons = [Sparkles, Layers, Palette, Grid, ImageIcon];
     const Icon = icons[index % icons.length];
 
+    // More vibrant default colors if project color isn't defined
+    const defaultGradient = "from-indigo-600 via-purple-600 to-pink-500";
+
     return (
       <div
         className={`absolute inset-0 bg-gradient-to-br ${
-          project.color || "from-purple-400 to-pink-400"
+          project.color || defaultGradient
         } overflow-hidden`}
       >
-        {/* Animated gradient orbs */}
-        <div className="absolute top-10 left-10 w-32 h-32 bg-white/20 rounded-full blur-3xl animate-pulse" />
+        {/* Enhanced animated gradient orbs with more vibrant colors */}
+        <div className="absolute top-10 left-10 w-32 h-32 bg-white/30 rounded-full blur-3xl animate-pulse" />
         <div
-          className="absolute bottom-10 right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl animate-pulse"
+          className="absolute bottom-10 right-10 w-40 h-40 bg-white/30 rounded-full blur-3xl animate-pulse"
           style={{ animationDelay: "1s" }}
         />
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-white/15 rounded-full blur-3xl animate-pulse"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-white/30 rounded-full blur-3xl animate-pulse"
           style={{ animationDelay: "0.5s" }}
         />
 
-        {/* Content */}
+        {/* Enhanced Content with glow effects and improved contrast */}
         <div className="relative h-full flex flex-col items-center justify-center text-white">
-          <div className="bg-white/20 backdrop-blur-sm rounded-full p-6 mb-4 animate-bounce">
-            <Icon className="w-12 h-12" />
+          {/* Improved icon container with glow effect */}
+          <div className="bg-white/30 backdrop-blur-sm rounded-full p-6 mb-4 animate-bounce shadow-lg shadow-white/20 ring-4 ring-white/10">
+            <div className="relative">
+              {/* Creating a glow effect with pseudo-element */}
+              <div className="absolute inset-0 blur-md bg-white opacity-50 scale-110 rounded-full"></div>
+              <Icon
+                className="w-12 h-12 relative z-10 text-white filter brightness-125"
+                style={{
+                  filter: "drop-shadow(0 0 10px rgba(255, 255, 255, 0.8))",
+                }}
+              />
+            </div>
           </div>
-          <h3 className="text-2xl font-bold mb-2">{project.title}</h3>
-          <p className="text-white/80">{project.category}</p>
-          {showNoImagesMessage ? (
-            <p className="text-sm text-white/60 mt-2">No images available</p>
-          ) : (
-            <p className="text-sm text-white/60 mt-2">Image {index + 1}</p>
+          <h3 className="text-2xl font-bold mb-2 text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]">
+            {project.title}
+          </h3>
+          <p className="text-white font-medium">{project.category}</p>
+          {!showNoImagesMessage && (
+            <div className="mt-3 px-4 py-2 bg-black/40 backdrop-blur-md rounded-lg border border-white/20">
+              <p className="text-sm text-white">Image {index + 1}</p>
+            </div>
           )}
         </div>
       </div>
@@ -425,10 +440,19 @@ export default function Projects() {
                             <div
                               className={`w-full h-full bg-gradient-to-br ${
                                 selectedProject.color ||
-                                "from-purple-400 to-pink-400"
-                              } flex items-center justify-center`}
+                                "from-indigo-600 via-purple-600 to-pink-500"
+                              } flex items-center justify-center shadow-inner shadow-white/30`}
                             >
-                              <Sparkles className="w-6 h-6 text-white/80" />
+                              <div className="relative">
+                                <div className="absolute inset-0 blur-md bg-white opacity-50 scale-110 rounded-full"></div>
+                                <Sparkles
+                                  className="w-6 h-6 text-white relative z-10 filter brightness-125"
+                                  style={{
+                                    filter:
+                                      "drop-shadow(0 0 6px rgba(255, 255, 255, 0.8))",
+                                  }}
+                                />
+                              </div>
                             </div>
                           )}
                           {idx === currentImageIndex && (
@@ -477,32 +501,6 @@ export default function Projects() {
           </div>
         </div>
       )}
-
-      <style jsx>{`
-        @keyframes blob {
-          0% {
-            transform: translate(0px, 0px) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-          100% {
-            transform: translate(0px, 0px) scale(1);
-          }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
     </section>
   );
 }
