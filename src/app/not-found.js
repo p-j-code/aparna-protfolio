@@ -1,15 +1,17 @@
-import Link from 'next/link'
-import { Home, ArrowLeft } from 'lucide-react'
+import Link from "next/link";
+import { Home, ArrowLeft } from "lucide-react";
 
 export default function NotFound() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50">
       <div className="text-center px-6">
         <h1 className="text-9xl font-bold text-gradient mb-4">404</h1>
-        <h2 className="text-3xl font-semibold text-gray-800 mb-4">Page Not Found</h2>
+        <h2 className="text-3xl font-semibold text-gray-800 mb-4">
+          Page Not Found
+        </h2>
         <p className="text-gray-600 mb-8 max-w-md mx-auto">
-          Oops! The page you're looking for doesn't exist. 
-          It might have been moved or deleted.
+          Oops! The page you&apos;re looking for doesn&apos;t exist. It might
+          have been moved or deleted.
         </p>
         <div className="flex gap-4 justify-center">
           <Link
@@ -29,5 +31,5 @@ export default function NotFound() {
         </div>
       </div>
     </div>
-  )
+  );
 }
