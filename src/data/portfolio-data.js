@@ -49,7 +49,7 @@ export const portfolioData = {
       tags: ["Packaging", "Illustration", "Brand Design"],
       stats: "Now in stores nationwide",
       featured: true,
-      images: ["/projects/nataraj-1.jpg", "/projects/nataraj-2.jpg"],
+      images: ["/projects/24colorshs/img1.png"],
       color: "from-red-500 to-yellow-500",
     },
     {
@@ -63,7 +63,7 @@ export const portfolioData = {
       tags: ["Illustration", "Typography", "Book Design"],
       stats: "Mumbai Book Fair 2025",
       featured: true,
-      images: ["/projects/books-1.jpg"],
+      images: [],
       color: "from-purple-500 to-pink-500",
     },
     {
@@ -77,7 +77,7 @@ export const portfolioData = {
       tags: ["Poster Design", "Social Impact", "Typography"],
       stats: "20,000+ shares",
       featured: true,
-      images: ["/projects/environment-1.jpg"],
+      images: [],
       color: "from-green-500 to-teal-500",
     },
     {
@@ -90,7 +90,7 @@ export const portfolioData = {
       tags: ["Logo Design", "Brand Guidelines", "Visual Identity"],
       stats: "3 successful launches",
       featured: true,
-      images: ["/projects/branding-1.jpg"],
+      images: [],
       color: "from-blue-500 to-indigo-500",
     },
   ],
