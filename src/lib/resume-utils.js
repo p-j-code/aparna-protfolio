@@ -1,4 +1,4 @@
-import { put, head, list } from "@vercel/blob";
+import { put, list } from "@vercel/blob";
 import { promises as fs } from "fs";
 import path from "path";
 
@@ -27,6 +27,7 @@ export async function getResumeData() {
       await put("resume-data.json", JSON.stringify(defaultData), {
         access: "public",
         contentType: "application/json",
+        allowOverwrite: true, // Add this
       });
 
       return defaultData;
@@ -47,17 +48,18 @@ export async function getResumeData() {
 export async function updateResumeData(newData) {
   try {
     if (isProduction) {
-      // Save to Vercel Blob
+      // Save to Vercel Blob with overwrite enabled
       const blob = await put(
         "resume-data.json",
         JSON.stringify(newData, null, 2),
         {
           access: "public",
           contentType: "application/json",
+          allowOverwrite: true, // This is the key fix!
         }
       );
 
-      // Optional: Create backup
+      // Optional: Create backup with unique timestamp
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
       await put(
         `backups/resume-data-${timestamp}.json`,
@@ -65,6 +67,7 @@ export async function updateResumeData(newData) {
         {
           access: "public",
           contentType: "application/json",
+          // No need for allowOverwrite here since timestamp makes it unique
         }
       );
 
