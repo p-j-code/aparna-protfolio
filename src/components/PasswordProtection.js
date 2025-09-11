@@ -1,0 +1,81 @@
+"use client";
+
+import { useState } from "react";
+
+export default function PasswordProtection({ onAuthenticated }) {
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+
+    try {
+      // Validate locally first to save a potentially unnecessary API call
+      if (!password.trim()) {
+        setError("Password is required");
+        return;
+      }
+
+      // Store password in session storage (this will be used for API calls)
+      sessionStorage.setItem("resumePassword", password);
+
+      // Call onAuthenticated with the password
+      onAuthenticated(password);
+    } catch (error) {
+      console.error("Authentication error:", error);
+      setError("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-gray-900">Resume Editor</h1>
+          <p className="mt-2 text-sm text-gray-600">
+            Enter password to access the resume editor
+          </p>
+        </div>
+
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {error && (
+            <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
+              {error}
+            </div>
+          )}
+
+          <div>
+            <label htmlFor="password" className="sr-only">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              required
+              className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:bg-purple-400"
+            >
+              {isLoading ? "Authenticating..." : "Access Editor"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,105 @@
+{
+  "name": "Aparna Munagekar",
+  "title": "Graphic Designer | Packaging Design Specialist | Visual Storyteller",
+  "contact": {
+    "email": "helloaparnam@gmail.com",
+    "phone": "+91 99870 37136",
+    "website": "aparna-portfolio.vercel.app",
+    "location": "Mumbai, Maharashtra, India",
+    "social": {
+      "linkedin": "https://linkedin.com/in/aparna-munagekar",
+      "behance": "https://behance.net/aparnamunagekar1",
+      "behance2": "https://behance.net/aparnamunagekar"
+    }
+  },
+  "summary": "Creative Graphic Designer with expertise in packaging design and brand identity. Successfully designed packaging for major national brand Nataraj Stationery (10, 12, and 24 colour pencils), now in retail stores nationwide. Skilled in creating designs that connect with target audiences while maintaining brand consistency. Proficient in Adobe Creative Suite with strong foundation in typography, illustration, and print production.",
+  "additionalInfo": {
+    "languages": [
+      {
+        "name": "English",
+        "level": "Fluent"
+      },
+      {
+        "name": "Hindi",
+        "level": "Fluent"
+      },
+      {
+        "name": "Marathi",
+        "level": "Native"
+      }
+    ],
+    "interests": [
+      "Typography",
+      "Sustainable Packaging",
+      "Children's Illustration",
+      "Visual Storytelling"
+    ]
+  },
+  "experience": [
+    {
+      "company": "JUST DESIGN STUDIO",
+      "position": "Graphic Designer",
+      "location": "Mumbai",
+      "duration": "Aug 2024 – Present",
+      "description": "",
+      "achievements": [
+        "Designed complete packaging for Nataraj Colour Pencils series (10, 12, and 24 colours) featuring original character illustrations, now in retail stores nationwide",
+        "Conceptualized and produced print-ready collateral for 10+ client accounts across FMCG, retail, and education sectors",
+        "Led rebranding projects for 3 SMEs including logo redesign, brand guidelines, and marketing collateral",
+        "Created sustainable packaging solutions contributing to 15% sales uplift for retail client",
+        "Managed multiple projects simultaneously while meeting tight deadlines and maintaining quality standards"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "Diploma in Applied Arts – Graphic Design",
+      "institution": "Sophia Shree B.K. Somani Memorial Polytechnic",
+      "location": "Mumbai",
+      "year": ""
+    },
+    {
+      "degree": "Higher Secondary Certificate (HSC) – Arts",
+      "institution": "Kirti M. Doongursee College",
+      "location": "Mumbai",
+      "year": ""
+    }
+  ],
+  "skillsConfig": {
+    "enableCategories": true,
+    "categories": [
+      {
+        "name": "Design Expertise",
+        "skills": [
+          "Packaging Design & Production",
+          "Brand Identity Development",
+          "Children's Product Design",
+          "Typography (Latin & Devanagari)",
+          "Publication & Book Cover Design",
+          "Logo Design & Illustration"
+        ]
+      },
+      {
+        "name": "Technical Skills",
+        "skills": [
+          "Adobe Illustrator (Advanced)",
+          "Adobe Photoshop (Advanced)",
+          "Adobe InDesign • Canva",
+          "Print Production & Pre-press",
+          "Color Management (CMYK/RGB)",
+          "Packaging Mockups & Die-lines"
+        ]
+      }
+    ]
+  },
+  "projects": [
+    {
+      "name": "Major Brand Packaging - Nataraj Stationery (2024-2025)",
+      "description": "Designed complete product packaging for Nataraj Colour Pencils series (10, 12, and 24 colours) with vibrant character illustrations. Packaging successfully launched nationwide and featured in official marketing campaigns."
+    },
+    {
+      "name": "Publication & Environmental Design",
+      "description": "Illustrated children's book covers featured at 2025 Mumbai Book Fair. Created poster series for World Environment Day 2025 achieving 20,000+ organic shares. Completed logo redesigns for 3 SMEs, improving brand recognition and market positioning."
+    }
+  ]
+}
