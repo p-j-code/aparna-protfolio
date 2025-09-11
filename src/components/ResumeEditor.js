@@ -737,8 +737,8 @@ export default function ResumeEditor({ initialData, password }) {
                       Use Skill Categories
                     </h3>
                     <p className="text-sm text-gray-600 mt-1">
-                      Organize skills into categories like "Design Expertise"
-                      and "Technical Skills"
+                      Organize skills into categories like &quot;Design
+                      Expertise&quot; and &quot;Technical Skills&quot;
                     </p>
                   </div>
                   {isEditing && (
@@ -1305,9 +1305,9 @@ export default function ResumeEditor({ initialData, password }) {
               {/* Info Note */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-sm text-blue-800">
-                  💡 <span className="font-medium">Note:</span> The "Online
-                  Presence" information is automatically generated from your
-                  Portfolio Website and Social Links in the Personal Info
+                  💡 <span className="font-medium">Note:</span> The &quot;Online
+                  Presence&quot; information is automatically generated from
+                  your Portfolio Website and Social Links in the Personal Info
                   section.
                 </p>
               </div>
