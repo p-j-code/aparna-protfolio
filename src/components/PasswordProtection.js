@@ -12,7 +12,10 @@ import { useState, useEffect } from "react";
  * 3. Validates password against NEXT_PUBLIC_RESUME_PASSWORD
  * 4. Stores valid passwords in sessionStorage for persistence
  */
-export default function PasswordProtection({ onAuthenticated }) {
+export default function PasswordProtection({
+  onAuthenticated,
+  isAdminRoute = false,
+}) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -67,12 +70,28 @@ export default function PasswordProtection({ onAuthenticated }) {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Resume Editor</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {isAdminRoute ? "Admin Access" : "Resume Editor"}
+          </h1>
           <p className="mt-2 text-sm text-gray-600">
-            Enter password to access the resume editor
+            {isAdminRoute
+              ? "Enter password to access the admin area"
+              : "Enter password to access the resume editor"}
           </p>
+          {!isAdminRoute && (
+            <p className="mt-1 text-xs text-purple-600">
+              You can view the resume without logging in, but editing requires
+              authentication.
+            </p>
+          )}
+          {isAdminRoute && (
+            <p className="mt-1 text-xs text-purple-600">
+              <a href="/resume" className="underline hover:text-purple-800">
+                Return to public view
+              </a>
+            </p>
+          )}
         </div>
-
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
             <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">

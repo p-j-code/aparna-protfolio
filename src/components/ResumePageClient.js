@@ -5,7 +5,11 @@ import PasswordProtection from "@/components/PasswordProtection";
 import ResumeEditor from "@/components/ResumeEditor";
 import ResumeViewer from "@/components/ResumeViewer";
 
-export default function ResumePageClient({ initialData }) {
+export default function ResumePageClient({
+  initialData,
+  viewOnly = false,
+  requireAuth = false,
+}) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState("view"); // 'view' or 'edit'
@@ -39,6 +43,12 @@ export default function ResumePageClient({ initialData }) {
     setMenuOpen(false);
   };
 
+  const handleLoginClick = () => {
+    // When user clicks "Login to Edit", show the password protection screen
+    setIsAuthenticated(false);
+    setMenuOpen(false);
+  };
+
   const handleDataUpdate = (newData) => {
     setResumeData(newData);
     setMode("view");
@@ -51,9 +61,16 @@ export default function ResumePageClient({ initialData }) {
     }, 100);
   };
 
-  // Show authentication screen if not authenticated
-  if (!isAuthenticated) {
-    return <PasswordProtection onAuthenticated={handleAuthenticated} />;
+  // Show authentication screen if:
+  // 1. requireAuth is true and user is not authenticated (admin route)
+  // 2. user is not authenticated but tries to edit (not relevant for pure viewOnly)
+  if ((requireAuth && !isAuthenticated) || (!isAuthenticated && !viewOnly)) {
+    return (
+      <PasswordProtection
+        onAuthenticated={handleAuthenticated}
+        isAdminRoute={requireAuth}
+      />
+    );
   }
 
   return (
@@ -61,18 +78,34 @@ export default function ResumePageClient({ initialData }) {
       {/* Desktop Floating Buttons - Top Left */}
       <div className="hidden sm:block fixed top-4 left-4 z-50 print:hidden">
         <div className="flex space-x-2">
-          <button
-            onClick={toggleMode}
-            className="px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded shadow-lg transition-all hover:shadow-xl"
-          >
-            {mode === "view" ? "Switch to Editor" : "Switch to Viewer"}
-          </button>
-          <button
-            onClick={handleSignOut}
-            className="px-4 py-2 bg-gray-600 text-white hover:bg-gray-700 rounded shadow-lg transition-all hover:shadow-xl"
-          >
-            Sign Out
-          </button>
+          {/* View-only public route without auth */}
+          {viewOnly && !isAuthenticated && !requireAuth ? (
+            <></>
+          ) : (
+            <>
+              {/* Admin route or authenticated state */}
+              <button
+                onClick={toggleMode}
+                className={`px-4 py-2 ${
+                  isAuthenticated
+                    ? "bg-purple-600 text-white hover:bg-purple-700"
+                    : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                } rounded shadow-lg transition-all hover:shadow-xl`}
+                disabled={!isAuthenticated}
+              >
+                {mode === "view" ? "Switch to Editor" : "Switch to Viewer"}
+              </button>
+
+              {isAuthenticated && (
+                <button
+                  onClick={handleSignOut}
+                  className="px-4 py-2 bg-gray-600 text-white hover:bg-gray-700 rounded shadow-lg transition-all hover:shadow-xl"
+                >
+                  Sign Out
+                </button>
+              )}
+            </>
+          )}
         </div>
       </div>
 
@@ -106,77 +139,128 @@ export default function ResumePageClient({ initialData }) {
               : "translate-y-8 opacity-0 pointer-events-none"
           }`}
         >
-          {/* Sign Out Button */}
-          <button
-            onClick={handleSignOut}
-            className="flex items-center justify-end gap-3 bg-white rounded-full shadow-lg pr-2 transition-all hover:shadow-xl"
-          >
-            <span className="px-3 py-1 text-sm font-medium text-gray-700">
-              Sign Out
-            </span>
-            <div className="w-10 h-10 flex items-center justify-center bg-gray-600 text-white rounded-full">
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
-            </div>
-          </button>
-
-          {/* Toggle Mode Button */}
-          <button
-            onClick={toggleMode}
-            className="flex items-center justify-end gap-3 bg-white rounded-full shadow-lg pr-2 transition-all hover:shadow-xl"
-          >
-            <span className="px-3 py-1 text-sm font-medium text-gray-700">
-              {mode === "view" ? "Edit Resume" : "View Resume"}
-            </span>
-            <div className="w-10 h-10 flex items-center justify-center bg-purple-600 text-white rounded-full">
-              {mode === "view" ? (
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+          {viewOnly && !isAuthenticated && !requireAuth ? (
+            /* Admin Access Link for View Only Mode */
+            <></>
+          ) : (
+            <>
+              {/* Sign Out Button - Only show when authenticated */}
+              {isAuthenticated && (
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center justify-end gap-3 bg-white rounded-full shadow-lg pr-2 transition-all hover:shadow-xl"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                  />
-                </svg>
+                  <span className="px-3 py-1 text-sm font-medium text-gray-700">
+                    Sign Out
+                  </span>
+                  <div className="w-10 h-10 flex items-center justify-center bg-gray-600 text-white rounded-full">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                      />
+                    </svg>
+                  </div>
+                </button>
               )}
-            </div>
-          </button>
+
+              {/* Toggle Mode Button - Disabled when not authenticated */}
+              <button
+                onClick={isAuthenticated ? toggleMode : null}
+                className={`flex items-center justify-end gap-3 bg-white rounded-full shadow-lg pr-2 transition-all ${
+                  isAuthenticated
+                    ? "hover:shadow-xl"
+                    : "opacity-70 cursor-not-allowed"
+                }`}
+                disabled={!isAuthenticated}
+              >
+                <span className="px-3 py-1 text-sm font-medium text-gray-700">
+                  {mode === "view" ? "Edit Resume" : "View Resume"}
+                </span>
+                <div
+                  className={`w-10 h-10 flex items-center justify-center ${
+                    isAuthenticated ? "bg-purple-600" : "bg-gray-400"
+                  } text-white rounded-full`}
+                >
+                  {mode === "view" ? (
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
+                    </svg>
+                  )}
+                </div>
+              </button>
+
+              {/* Public View Button - Only show on admin route */}
+              {requireAuth && (
+                <a
+                  href="/resume"
+                  className="flex items-center justify-end gap-3 bg-white rounded-full shadow-lg pr-2 transition-all hover:shadow-xl"
+                >
+                  <span className="px-3 py-1 text-sm font-medium text-gray-700">
+                    Public View
+                  </span>
+                  <div className="w-10 h-10 flex items-center justify-center bg-green-600 text-white rounded-full">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      />
+                    </svg>
+                  </div>
+                </a>
+              )}
+            </>
+          )}
 
           {/* Print Button (only in view mode) */}
           {mode === "view" && (
@@ -232,26 +316,50 @@ export default function ResumePageClient({ initialData }) {
       {/* Quick Action Bar for Tablets (optional) */}
       <div className="hidden md:hidden sm:flex fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 print:hidden bg-white rounded-full shadow-lg px-2 py-2">
         <div className="flex space-x-2">
-          <button
-            onClick={toggleMode}
-            className="px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-full text-sm transition-colors"
-          >
-            {mode === "view" ? "Edit" : "View"}
-          </button>
-          {mode === "view" && (
-            <button
-              onClick={handlePrint}
-              className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full text-sm transition-colors"
-            >
-              Print
-            </button>
+          {viewOnly && !isAuthenticated && !requireAuth ? (
+            <></>
+          ) : (
+            <>
+              <button
+                onClick={isAuthenticated ? toggleMode : null}
+                className={`px-4 py-2 ${
+                  isAuthenticated
+                    ? "bg-purple-600 text-white hover:bg-purple-700"
+                    : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                } rounded-full text-sm transition-colors`}
+                disabled={!isAuthenticated}
+              >
+                {mode === "view" ? "Edit" : "View"}
+              </button>
+
+              {mode === "view" && (
+                <button
+                  onClick={handlePrint}
+                  className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-full text-sm transition-colors"
+                >
+                  Print
+                </button>
+              )}
+
+              {isAuthenticated && (
+                <button
+                  onClick={handleSignOut}
+                  className="px-4 py-2 bg-gray-600 text-white hover:bg-gray-700 rounded-full text-sm transition-colors"
+                >
+                  Sign Out
+                </button>
+              )}
+
+              {requireAuth && (
+                <a
+                  href="/resume"
+                  className="px-4 py-2 bg-teal-600 text-white hover:bg-teal-700 rounded-full text-sm transition-colors"
+                >
+                  Public
+                </a>
+              )}
+            </>
           )}
-          <button
-            onClick={handleSignOut}
-            className="px-4 py-2 bg-gray-600 text-white hover:bg-gray-700 rounded-full text-sm transition-colors"
-          >
-            Sign Out
-          </button>
         </div>
       </div>
 

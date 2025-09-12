@@ -10,6 +10,6 @@ const ResumePageClient = dynamic(
   }
 );
 
-export default function ClientResumeWrapper({ initialData }) {
-  return <ResumePageClient initialData={initialData} />;
+export default function ClientResumeWrapper({ initialData, viewOnly = false, requireAuth = false }) {
+  return <ResumePageClient initialData={initialData} viewOnly={viewOnly} requireAuth={requireAuth} />;
 }
