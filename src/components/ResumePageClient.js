@@ -60,7 +60,7 @@ export default function ResumePageClient({ initialData }) {
       </div>
 
       {mode === "view" ? (
-        <ResumeViewer resumeData={initialData} />
+        <ResumeViewer resumeData={initialData} password={password} />
       ) : (
         <ResumeEditor initialData={initialData} password={password} />
       )}

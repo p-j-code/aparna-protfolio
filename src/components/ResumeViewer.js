@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useRef } from "react";
+import PDFGenerator from "./PDFGenerator";
+import ResumeDownload from "./ResumeDownload";
 
-export default function ResumeViewer({ resumeData }) {
+export default function ResumeViewer({ resumeData, password }) {
   const [isPrinting, setIsPrinting] = useState(false);
   const resumeRef = useRef(null);
 
@@ -23,19 +25,24 @@ export default function ResumeViewer({ resumeData }) {
 
       {/* Print Button */}
       {!isPrinting && (
-        <div className="fixed top-4 right-4 z-50 print:hidden">
+        <div className="fixed top-4 right-4 z-50 print:hidden flex gap-3">
           <button
             onClick={handlePrint}
             className="px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded shadow-lg transition-colors"
           >
             Print Resume
           </button>
+          <ResumeDownload />
+          {password && (
+            <PDFGenerator resumeData={resumeData} password={password} />
+          )}
         </div>
       )}
 
       {/* Resume Container */}
       <div className="min-h-screen bg-gray-50 py-8 print:py-0 print:bg-white">
         <div
+          id="resume-content"
           ref={resumeRef}
           className="relative max-w-[8.5in] mx-auto bg-white shadow-lg print:shadow-none"
           style={{ minHeight: "11in" }}
