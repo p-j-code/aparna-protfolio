@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { updateResumeData, checkPassword } from "@/utils/resume-utils-server";
+import { updateResumeData, checkPassword } from "@/lib/resume-utils-server";
 
 export async function POST(request) {
   try {
@@ -43,37 +43,6 @@ export async function POST(request) {
     console.error("Error in resume update API:", error);
     return NextResponse.json(
       { success: false, message: "An unexpected error occurred" },
-      { status: 500 }
-    );
-  }
-}
-
-// Optional: Add GET method to fetch current data
-export async function GET(request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const password = searchParams.get("password");
-
-    // Verify password
-    const isValid = await checkPassword(password);
-    if (!isValid) {
-      return NextResponse.json(
-        { success: false, message: "Invalid password" },
-        { status: 401 }
-      );
-    }
-
-    const { getResumeData } = await import("@/utils/resume-utils-server");
-    const data = await getResumeData();
-
-    return NextResponse.json({
-      success: true,
-      data: data,
-    });
-  } catch (error) {
-    console.error("Error fetching resume data:", error);
-    return NextResponse.json(
-      { success: false, message: "Failed to fetch resume data" },
       { status: 500 }
     );
   }

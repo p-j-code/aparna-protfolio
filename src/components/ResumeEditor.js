@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function ResumeEditor({ initialData, password }) {
+export default function ResumeEditor({ initialData, password, onDataUpdate }) {
   const router = useRouter();
   const [resumeData, setResumeData] = useState(initialData);
   const [isSaving, setIsSaving] = useState(false);
