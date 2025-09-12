@@ -1,21 +1,20 @@
 import { NextResponse } from "next/server";
-import { list } from "@vercel/blob";
+import { head } from "@vercel/blob";
 
 export async function GET() {
   try {
-    // Get the latest published PDF
-    const { blobs } = await list({
-      prefix: "public/",
-      limit: 1,
-    });
+    // Get the metadata
+    const metadataBlob = await head("public/resume-metadata.json");
 
-    if (blobs.length > 0) {
-      const latestPdf = blobs[0];
+    if (metadataBlob) {
+      const response = await fetch(metadataBlob.url);
+      const metadata = await response.json();
+
       return NextResponse.json({
         success: true,
-        pdfUrl: latestPdf.url,
-        fileName: latestPdf.pathname,
-        updatedAt: latestPdf.uploadedAt,
+        pdfUrl: metadata.url,
+        fileName: metadata.fileName,
+        updatedAt: metadata.updatedAt,
       });
     }
 

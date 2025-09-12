@@ -3,7 +3,7 @@
 import { useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { put } from "@vercel/blob";
+import { upload } from "@vercel/blob/client";
 
 export default function PDFGenerator({ resumeData, password }) {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -18,84 +18,90 @@ export default function PDFGenerator({ resumeData, password }) {
       // Get the resume element
       const element = document.getElementById("resume-content");
 
-      // Generate canvas from HTML
+      // Generate canvas with lower quality for smaller size
       const canvas = await html2canvas(element, {
-        scale: 2,
+        scale: 1.5, // Reduced from 2 to 1.5 for smaller file size
         useCORS: true,
         logging: false,
+        imageTimeout: 0,
+        quality: 0.92, // Slightly reduce quality
       });
 
-      // Create PDF
-      const imgData = canvas.toDataURL("image/png");
+      // Create PDF with compression
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "in",
         format: "letter",
+        compress: true, // Enable compression
       });
 
       const imgWidth = 8.5;
       const pageHeight = 11;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      // Convert to JPEG for smaller size (PNG is larger)
+      const imgData = canvas.toDataURL("image/jpeg", 0.95);
+
       let heightLeft = imgHeight;
       let position = 0;
 
-      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
 
       while (heightLeft >= 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
       }
 
       // Get PDF as blob
       const pdfBlob = pdf.output("blob");
 
-      // Upload to Vercel Blob
-      const response = await fetch("/api/resume/publish", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          password,
-          pdfBase64: await blobToBase64(pdfBlob),
-          fileName: `${resumeData.name
-            .replace(/\s+/g, "-")
-            .toLowerCase()}-resume.pdf`,
-        }),
+      // Check file size
+      const fileSizeMB = pdfBlob.size / (1024 * 1024);
+      console.log(`PDF size: ${fileSizeMB.toFixed(2)} MB`);
+
+      if (fileSizeMB > 4) {
+        setMessage("✗ PDF too large. Try removing some content.");
+        return;
+      }
+
+      // Direct upload to Vercel Blob
+      const fileName = `${resumeData.name
+        .replace(/\s+/g, "-")
+        .toLowerCase()}-resume.pdf`;
+
+      const blob = await upload(fileName, pdfBlob, {
+        access: "public",
+        handleUploadUrl: "/api/resume/upload",
       });
 
-      const result = await response.json();
+      setPublishedUrl(blob.url);
+      setMessage("✓ Resume published successfully!");
 
-      if (result.success) {
-        setPublishedUrl(result.pdfUrl);
-        setMessage("✓ Resume published successfully!");
+      // Also trigger download
+      pdf.save(fileName);
 
-        // Also trigger download
-        pdf.save(`${resumeData.name.replace(/\s+/g, "-")}-resume.pdf`);
+      // Copy URL to clipboard
+      navigator.clipboard.writeText(blob.url);
 
-        // Copy URL to clipboard
-        navigator.clipboard.writeText(result.pdfUrl);
-      } else {
-        setMessage("✗ Failed to publish resume");
-      }
+      // Save URL to database for portfolio access
+      await fetch("/api/resume/save-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          password,
+          pdfUrl: blob.url,
+          fileName: fileName,
+        }),
+      });
     } catch (error) {
       console.error("Error generating PDF:", error);
       setMessage("✗ Error generating PDF");
     } finally {
       setIsGenerating(false);
     }
-  };
-
-  const blobToBase64 = (blob) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result.split(",")[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
   };
 
   return (
@@ -117,14 +123,19 @@ export default function PDFGenerator({ resumeData, password }) {
       )}
 
       {publishedUrl && (
-        <a
-          href={publishedUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:underline text-sm"
-        >
-          View Published PDF
-        </a>
+        <div className="flex flex-col gap-1">
+          <a
+            href={publishedUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline text-sm"
+          >
+            View Published PDF
+          </a>
+          <span className="text-xs text-gray-500">
+            URL copied to clipboard!
+          </span>
+        </div>
       )}
     </div>
   );
