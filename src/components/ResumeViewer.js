@@ -394,7 +394,7 @@ export default function ResumeViewer({
                       </span>{" "}
                       {resumeData.contact.website && (
                         <span
-                          className="text-purple-600 break-all"
+                          className="text-purple-600 break-all inline"
                           style={{ printColorAdjust: "exact" }}
                         >
                           {resumeData.contact.website}
@@ -405,7 +405,12 @@ export default function ResumeViewer({
                           className="text-purple-600 block sm:inline print:inline"
                           style={{ printColorAdjust: "exact" }}
                         >
-                          {resumeData.contact.website ? " • " : ""}
+                          <span className="hidden sm:inline print:inline">
+                            {resumeData.contact.website ? " • " : ""}
+                          </span>
+                          <span className="sm:hidden print:hidden">
+                            {resumeData.contact.website ? "• " : ""}
+                          </span>
                           behance.net/aparnamunagekar
                         </span>
                       )}
@@ -414,8 +419,8 @@ export default function ResumeViewer({
                           className="text-purple-600 block sm:inline print:inline"
                           style={{ printColorAdjust: "exact" }}
                         >
-                          {" "}
-                          • behance.net/aparnamunagekar1
+                          <span className="print:inline"> • </span>
+                          behance.net/aparnamunagekar1
                         </span>
                       )}
                     </div>
