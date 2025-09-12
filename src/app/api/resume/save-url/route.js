@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { put } from "@vercel/blob";
+import { checkPassword } from "@/lib/resume-utils-server";
 
 export async function POST(request) {
   try {
@@ -7,7 +8,7 @@ export async function POST(request) {
     const { password, pdfUrl, fileName } = body;
 
     // Validate password
-    if (!password || password !== process.env.RESUME_PASSWORD) {
+    if (!password || !checkPassword(password)) {
       return NextResponse.json(
         { success: false, message: "Invalid password" },
         { status: 401 }

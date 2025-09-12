@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { checkPassword, updateResumeData } from "@/lib/resume-utils";
+import { updateResumeData, checkPassword } from "@/lib/resume-utils-server";
 
 export async function POST(request) {
   try {

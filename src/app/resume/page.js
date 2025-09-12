@@ -1,4 +1,4 @@
-import { getResumeData } from "@/lib/resume-utils";
+import { getResumeData } from "@/lib/resume-utils-server";
 import { Suspense } from "react";
 import ClientResumeWrapper from "@/components/ClientResumeWrapper";
 

@@ -1,11 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { checkPassword } from "@/lib/resume-utils";
+import { useState, useEffect } from "react";
 
+/**
+ * Password protection component for the resume editor
+ *
+ * This component:
+ * 1. Checks for existing valid session on initial load
+ * 2. If no valid session exists, displays the password form
+ * 3. Validates password against NEXT_PUBLIC_RESUME_PASSWORD
+ * 4. Stores valid passwords in sessionStorage for persistence
+ */
 export default function PasswordProtection({ onAuthenticated }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Check for existing session authentication on component mount
+  useEffect(() => {
+    const checkExistingSession = () => {
+      const storedPassword = sessionStorage.getItem("resumePassword");
+      if (storedPassword && checkPassword(storedPassword)) {
+        // If stored password is valid, authenticate immediately
+        onAuthenticated(storedPassword);
+      }
+    };
+
+    checkExistingSession();
+  }, [onAuthenticated]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,18 +39,26 @@ export default function PasswordProtection({ onAuthenticated }) {
       // Validate locally first to save a potentially unnecessary API call
       if (!password.trim()) {
         setError("Password is required");
+        setIsLoading(false);
         return;
       }
 
-      // Store password in session storage (this will be used for API calls)
-      sessionStorage.setItem("resumePassword", password);
+      // Check password locally
+      if (checkPassword(password)) {
+        // Store password in session storage (this will be used for API calls)
+        sessionStorage.setItem("resumePassword", password);
 
-      // Call onAuthenticated with the password
-      onAuthenticated(password);
+        // Call onAuthenticated with the password
+        onAuthenticated(password);
+        return;
+      } else {
+        setError("Invalid password");
+        setIsLoading(false);
+        return;
+      }
     } catch (error) {
       console.error("Authentication error:", error);
       setError("An unexpected error occurred");
-    } finally {
       setIsLoading(false);
     }
   };

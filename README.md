@@ -18,6 +18,27 @@ A modern, responsive portfolio website built with Next.js 13+ and Tailwind CSS.
 npm install
 ```
 
+## 🔧 Environment Variables
+
+Create a `.env.local` file in the root directory with the following variables:
+
+```
+# Resume editor password
+RESUME_PASSWORD=your_password_here
+
+# Client-accessible variable (must be prefixed with NEXT_PUBLIC_)
+NEXT_PUBLIC_RESUME_PASSWORD=your_password_here
+```
+
+This enables password protection for the resume editor both on server and client side.
+
+After setting up the environment variables, restart the development server for the changes to take effect:
+
+```bash
+# Stop the current server if running, then
+npm run dev
+```
+
 ## 🛠 Development
 
 ```bash
