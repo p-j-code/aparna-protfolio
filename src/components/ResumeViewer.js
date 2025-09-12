@@ -4,7 +4,11 @@ import { useState, useRef } from "react";
 import PDFGenerator from "./PDFGenerator";
 import ResumeDownload from "./ResumeDownload";
 
-export default function ResumeViewer({ resumeData, password }) {
+export default function ResumeViewer({
+  resumeData,
+  password,
+  hidePrintButton = false,
+}) {
   const [isPrinting, setIsPrinting] = useState(false);
   const resumeRef = useRef(null);
 
@@ -23,12 +27,12 @@ export default function ResumeViewer({ resumeData, password }) {
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
       `}</style>
 
-      {/* Print Button */}
-      {!isPrinting && (
-        <div className="fixed top-4 right-4 z-50 print:hidden flex gap-3">
+      {/* Print Button - Mobile Optimized (only show if not hidden) */}
+      {!isPrinting && !hidePrintButton && (
+        <div className="fixed top-2 right-2 sm:top-4 sm:right-4 z-50 print:hidden flex gap-2 sm:gap-3">
           <button
             onClick={handlePrint}
-            className="px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded shadow-lg transition-colors"
+            className="px-3 py-1.5 sm:px-4 sm:py-2 bg-purple-600 text-white hover:bg-purple-700 rounded shadow-lg transition-colors text-sm sm:text-base"
           >
             Print Resume
           </button>
@@ -39,29 +43,29 @@ export default function ResumeViewer({ resumeData, password }) {
         </div>
       )}
 
-      {/* Resume Container */}
-      <div className="min-h-screen bg-gray-50 py-8 print:py-0 print:bg-white">
+      {/* Resume Container - Mobile Responsive */}
+      <div className="min-h-screen bg-gray-50 py-4 sm:py-8 print:py-0 print:bg-white px-2 sm:px-4 print:px-0">
         <div
           id="resume-content"
           ref={resumeRef}
-          className="relative max-w-[8.5in] mx-auto bg-white shadow-lg print:shadow-none print:max-w-none"
+          className="relative max-w-full sm:max-w-[8.5in] mx-auto bg-white shadow-lg print:shadow-none print:max-w-none rounded-lg sm:rounded-none print:rounded-none"
           style={{ minHeight: "11in" }}
         >
           {/* Subtle Top Accent */}
           <div
-            className="h-2 bg-gradient-to-r from-purple-500 to-pink-500"
+            className="h-1 sm:h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-t-lg sm:rounded-t-none print:rounded-t-none"
             style={{
               printColorAdjust: "exact",
               WebkitPrintColorAdjust: "exact",
             }}
           />
 
-          {/* Content Container */}
-          <div className="relative px-12 py-8 print:px-8 print:py-6">
-            {/* Header Section */}
-            <header className="text-center mb-6 pb-4 print:mb-4 print:pb-3">
+          {/* Content Container - Mobile Responsive */}
+          <div className="relative px-4 py-4 sm:px-8 sm:py-6 lg:px-12 lg:py-8 print:px-8 print:py-6">
+            {/* Header Section - Mobile Optimized */}
+            <header className="text-center mb-4 pb-3 sm:mb-6 sm:pb-4 print:mb-4 print:pb-3">
               <h1
-                className="text-4xl font-bold text-purple-500 bg-clip-text mb-2 tracking-tight print:text-3xl"
+                className="text-2xl sm:text-3xl lg:text-4xl font-bold text-purple-500 bg-clip-text mb-2 tracking-tight print:text-3xl"
                 style={{
                   printColorAdjust: "exact",
                   WebkitPrintColorAdjust: "exact",
@@ -69,21 +73,21 @@ export default function ResumeViewer({ resumeData, password }) {
               >
                 {resumeData.name.toUpperCase()}
               </h1>
-              <div className="text-lg font-semibold text-gray-700 mb-3 print:text-base">
+              <div className="text-base sm:text-lg font-semibold text-gray-700 mb-2 sm:mb-3 print:text-base">
                 {resumeData.title}
               </div>
 
-              {/* Contact Info */}
-              <div className="text-sm text-gray-600 mb-2 print:text-xs">
+              {/* Contact Info - Mobile Responsive */}
+              <div className="text-xs sm:text-sm text-gray-600 mb-2 print:text-xs flex flex-col sm:flex-row sm:justify-center items-center gap-1 sm:gap-0">
                 <span>{resumeData.contact.location}</span>
-                <span className="mx-2 text-purple-400">•</span>
+                <span className="hidden sm:inline mx-2 text-purple-400">•</span>
                 <span>{resumeData.contact.phone}</span>
-                <span className="mx-2 text-purple-400">•</span>
-                <span>{resumeData.contact.email}</span>
+                <span className="hidden sm:inline mx-2 text-purple-400">•</span>
+                <span className="break-all">{resumeData.contact.email}</span>
               </div>
 
-              {/* Social Links */}
-              <div className="text-sm space-x-3 print:text-xs">
+              {/* Social Links - Mobile Responsive */}
+              <div className="text-xs sm:text-sm space-y-1 sm:space-y-0 sm:space-x-3 print:text-xs print:space-y-0 print:space-x-3">
                 {resumeData.contact.website && (
                   <a
                     href={`https://${resumeData.contact.website.replace(
@@ -92,7 +96,7 @@ export default function ResumeViewer({ resumeData, password }) {
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-purple-600 hover:text-pink-500 transition-colors font-medium"
+                    className="block sm:inline text-purple-600 hover:text-pink-500 transition-colors font-medium"
                     style={{ printColorAdjust: "exact" }}
                   >
                     Portfolio
@@ -100,12 +104,14 @@ export default function ResumeViewer({ resumeData, password }) {
                 )}
                 {resumeData.contact.social?.linkedin && (
                   <>
-                    <span className="text-gray-400">|</span>
+                    <span className="hidden sm:inline text-gray-400 print:inline">
+                      |
+                    </span>
                     <a
                       href={resumeData.contact.social.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-purple-600 hover:text-pink-500 transition-colors font-medium"
+                      className="block sm:inline text-purple-600 hover:text-pink-500 transition-colors font-medium"
                       style={{ printColorAdjust: "exact" }}
                     >
                       LinkedIn
@@ -114,12 +120,14 @@ export default function ResumeViewer({ resumeData, password }) {
                 )}
                 {resumeData.contact.social?.behance && (
                   <>
-                    <span className="text-gray-400">|</span>
+                    <span className="hidden sm:inline text-gray-400 print:inline">
+                      |
+                    </span>
                     <a
                       href={resumeData.contact.social.behance}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-purple-600 hover:text-pink-500 transition-colors font-medium"
+                      className="block sm:inline text-purple-600 hover:text-pink-500 transition-colors font-medium"
                       style={{ printColorAdjust: "exact" }}
                     >
                       Behance
@@ -128,12 +136,14 @@ export default function ResumeViewer({ resumeData, password }) {
                 )}
                 {resumeData.contact.social?.behance2 && (
                   <>
-                    <span className="text-gray-400">|</span>
+                    <span className="hidden sm:inline text-gray-400 print:inline">
+                      |
+                    </span>
                     <a
                       href={resumeData.contact.social.behance2}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-purple-600 hover:text-pink-500 transition-colors font-medium"
+                      className="block sm:inline text-purple-600 hover:text-pink-500 transition-colors font-medium"
                       style={{ printColorAdjust: "exact" }}
                     >
                       Behance 2
@@ -143,15 +153,15 @@ export default function ResumeViewer({ resumeData, password }) {
               </div>
             </header>
 
-            {/* Professional Summary */}
-            <section className="mb-6 print:mb-4">
+            {/* Professional Summary - Mobile Responsive */}
+            <section className="mb-4 sm:mb-6 print:mb-4">
               <h2
-                className="text-sm font-bold uppercase tracking-wider text-purple-700 mb-3 pb-1 border-b-2 border-purple-200 print:mb-2"
+                className="text-xs sm:text-sm font-bold uppercase tracking-wider text-purple-700 mb-2 sm:mb-3 pb-1 border-b-2 border-purple-200 print:mb-2 print:text-sm"
                 style={{ printColorAdjust: "exact" }}
               >
                 Professional Summary
               </h2>
-              <p className="text-sm text-gray-700 leading-relaxed print:text-xs">
+              <p className="text-xs sm:text-sm text-gray-700 leading-relaxed print:text-xs">
                 {resumeData.summary}
                 {resumeData.summary.includes("Nataraj") && (
                   <span
@@ -165,47 +175,47 @@ export default function ResumeViewer({ resumeData, password }) {
               </p>
             </section>
 
-            {/* Professional Experience */}
-            <section className="mb-6 print:mb-4">
+            {/* Professional Experience - Mobile Responsive */}
+            <section className="mb-4 sm:mb-6 print:mb-4">
               <h2
-                className="text-sm font-bold uppercase tracking-wider text-purple-700 mb-3 pb-1 border-b-2 border-purple-200 print:mb-2"
+                className="text-xs sm:text-sm font-bold uppercase tracking-wider text-purple-700 mb-2 sm:mb-3 pb-1 border-b-2 border-purple-200 print:mb-2 print:text-sm"
                 style={{ printColorAdjust: "exact" }}
               >
                 Professional Experience
               </h2>
               {resumeData.experience.map((exp, index) => (
-                <div key={index} className="mb-4 print:mb-3">
-                  <div className="flex justify-between items-baseline mb-1">
+                <div key={index} className="mb-3 sm:mb-4 print:mb-3">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1">
                     <div>
-                      <h3 className="text-base font-semibold text-gray-800 print:text-sm">
+                      <h3 className="text-sm sm:text-base font-semibold text-gray-800 print:text-sm">
                         {exp.position}
                       </h3>
                       <span
-                        className="text-sm font-medium text-purple-600 print:text-xs"
+                        className="text-xs sm:text-sm font-medium text-purple-600 print:text-xs"
                         style={{ printColorAdjust: "exact" }}
                       >
                         {exp.company}
                       </span>
-                      <span className="text-sm text-gray-600 print:text-xs">
+                      <span className="text-xs sm:text-sm text-gray-600 print:text-xs">
                         {" "}
                         — {exp.location || "Mumbai"}
                       </span>
                     </div>
-                    <span className="text-sm text-gray-500 italic print:text-xs">
+                    <span className="text-xs sm:text-sm text-gray-500 italic mt-1 sm:mt-0 print:text-xs print:mt-0">
                       {exp.duration}
                     </span>
                   </div>
                   {exp.description && (
-                    <p className="text-sm text-gray-600 mb-2 leading-relaxed print:text-xs">
+                    <p className="text-xs sm:text-sm text-gray-600 mb-2 leading-relaxed print:text-xs">
                       {exp.description}
                     </p>
                   )}
                   {exp.achievements && exp.achievements.length > 0 && (
-                    <ul className="ml-5 space-y-1 print:ml-4">
+                    <ul className="ml-4 sm:ml-5 space-y-1 print:ml-4">
                       {exp.achievements.map((achievement, i) => (
                         <li
                           key={i}
-                          className="text-sm text-gray-600 list-disc marker:text-purple-400 print:text-xs"
+                          className="text-xs sm:text-sm text-gray-600 list-disc marker:text-purple-400 print:text-xs"
                           style={{ printColorAdjust: "exact" }}
                         >
                           {achievement}
@@ -217,24 +227,24 @@ export default function ResumeViewer({ resumeData, password }) {
               ))}
             </section>
 
-            {/* Key Projects & Achievements */}
+            {/* Key Projects & Achievements - Mobile Responsive */}
             {resumeData.projects && resumeData.projects.length > 0 && (
-              <section className="mb-6 print:mb-4">
+              <section className="mb-4 sm:mb-6 print:mb-4">
                 <h2
-                  className="text-sm font-bold uppercase tracking-wider text-purple-700 mb-3 pb-1 border-b-2 border-purple-200 print:mb-2"
+                  className="text-xs sm:text-sm font-bold uppercase tracking-wider text-purple-700 mb-2 sm:mb-3 pb-1 border-b-2 border-purple-200 print:mb-2 print:text-sm"
                   style={{ printColorAdjust: "exact" }}
                 >
                   Key Projects & Achievements
                 </h2>
                 {resumeData.projects.map((project, index) => (
-                  <div key={index} className="mb-3 print:mb-2">
+                  <div key={index} className="mb-2 sm:mb-3 print:mb-2">
                     <h4
-                      className="text-sm font-semibold text-purple-600 mb-1 print:text-xs"
+                      className="text-xs sm:text-sm font-semibold text-purple-600 mb-1 print:text-xs"
                       style={{ printColorAdjust: "exact" }}
                     >
                       {project.name}
                     </h4>
-                    <p className="text-sm text-gray-600 leading-relaxed pl-2 print:text-xs">
+                    <p className="text-xs sm:text-sm text-gray-600 leading-relaxed pl-2 print:text-xs">
                       {project.description}
                     </p>
                   </div>
@@ -242,10 +252,10 @@ export default function ResumeViewer({ resumeData, password }) {
               </section>
             )}
 
-            {/* Core Competencies */}
-            <section className="mb-6 print:mb-4">
+            {/* Core Competencies - Mobile Responsive */}
+            <section className="mb-4 sm:mb-6 print:mb-4">
               <h2
-                className="text-sm font-bold uppercase tracking-wider text-purple-700 mb-3 pb-1 border-b-2 border-purple-200 print:mb-2"
+                className="text-xs sm:text-sm font-bold uppercase tracking-wider text-purple-700 mb-2 sm:mb-3 pb-1 border-b-2 border-purple-200 print:mb-2 print:text-sm"
                 style={{ printColorAdjust: "exact" }}
               >
                 Core Competencies
@@ -253,32 +263,32 @@ export default function ResumeViewer({ resumeData, password }) {
 
               {resumeData.skillsConfig?.enableCategories &&
               resumeData.skillsConfig?.categories ? (
-                // Categorized Display
-                <div className="grid grid-cols-2 gap-4 print:gap-3">
+                // Categorized Display - Mobile Responsive
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 print:grid-cols-2 print:gap-3">
                   {resumeData.skillsConfig.categories.map((category, index) => (
                     <div
                       key={index}
-                      className="border-l-3 border-purple-400 pl-3 print:pl-2"
+                      className="border-l-3 border-purple-400 pl-2 sm:pl-3 print:pl-2"
                       style={{
                         borderLeftWidth: "3px",
                         printColorAdjust: "exact",
                       }}
                     >
                       <h4
-                        className="text-sm font-semibold text-purple-700 mb-2 print:text-xs print:mb-1"
+                        className="text-xs sm:text-sm font-semibold text-purple-700 mb-1 sm:mb-2 print:text-xs print:mb-1"
                         style={{ printColorAdjust: "exact" }}
                       >
                         {category.name}
                       </h4>
-                      <div className="text-xs text-gray-700 print:text-[10px]">
+                      <div className="text-[10px] sm:text-xs text-gray-700 print:text-[10px]">
                         {category.skills?.join(" • ")}
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                // Simple List Display
-                <div className="flex flex-wrap gap-2 print:gap-1">
+                // Simple List Display - Mobile Responsive
+                <div className="flex flex-wrap gap-1 sm:gap-2 print:gap-1">
                   {(
                     resumeData.skills ||
                     resumeData.skillsConfig?.categories?.flatMap(
@@ -288,7 +298,7 @@ export default function ResumeViewer({ resumeData, password }) {
                   ).map((skill, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 bg-purple-50 border border-purple-300 text-gray-700 rounded text-sm print:text-xs print:px-2 print:py-0.5"
+                      className="px-2 py-0.5 sm:px-3 sm:py-1 bg-purple-50 border border-purple-300 text-gray-700 rounded text-[10px] sm:text-sm print:text-xs print:px-2 print:py-0.5"
                       style={{ printColorAdjust: "exact" }}
                     >
                       {skill}
@@ -298,28 +308,28 @@ export default function ResumeViewer({ resumeData, password }) {
               )}
             </section>
 
-            {/* Education */}
-            <section className="mb-6 print:mb-4">
+            {/* Education - Mobile Responsive */}
+            <section className="mb-4 sm:mb-6 print:mb-4">
               <h2
-                className="text-sm font-bold uppercase tracking-wider text-purple-700 mb-3 pb-1 border-b-2 border-purple-200 print:mb-2"
+                className="text-xs sm:text-sm font-bold uppercase tracking-wider text-purple-700 mb-2 sm:mb-3 pb-1 border-b-2 border-purple-200 print:mb-2 print:text-sm"
                 style={{ printColorAdjust: "exact" }}
               >
                 Education
               </h2>
-              <div className="grid grid-cols-2 gap-4 print:gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 print:grid-cols-2 print:gap-3">
                 {resumeData.education.map((edu, index) => (
                   <div key={index} className="">
-                    <h4 className="text-sm font-semibold text-gray-800 mb-1 print:text-xs">
+                    <h4 className="text-xs sm:text-sm font-semibold text-gray-800 mb-1 print:text-xs">
                       {edu.degree}
                     </h4>
-                    <div className="text-xs text-gray-600 print:text-[10px]">
+                    <div className="text-[10px] sm:text-xs text-gray-600 print:text-[10px]">
                       {edu.institution}
                       <br />
                       {edu.location}
                     </div>
                     {edu.year && (
                       <div
-                        className="text-xs text-purple-600 mt-1 print:text-[10px]"
+                        className="text-[10px] sm:text-xs text-purple-600 mt-1 print:text-[10px]"
                         style={{ printColorAdjust: "exact" }}
                       >
                         {edu.year}
@@ -330,16 +340,16 @@ export default function ResumeViewer({ resumeData, password }) {
               </div>
             </section>
 
-            {/* Additional Info */}
+            {/* Additional Info - Mobile Responsive */}
             <section>
               <div
-                className="border-t-2 border-purple-200 pt-3 print:pt-2"
+                className="border-t-2 border-purple-200 pt-2 sm:pt-3 print:pt-2"
                 style={{ printColorAdjust: "exact" }}
               >
-                <div className="text-xs text-gray-700 space-y-1 print:text-[10px]">
+                <div className="text-[10px] sm:text-xs text-gray-700 space-y-1 print:text-[10px]">
                   {resumeData.additionalInfo?.languages &&
                     resumeData.additionalInfo.languages.length > 0 && (
-                      <div>
+                      <div className="break-words">
                         <span
                           className="font-semibold text-purple-700"
                           style={{ printColorAdjust: "exact" }}
@@ -361,7 +371,7 @@ export default function ResumeViewer({ resumeData, password }) {
 
                   {resumeData.additionalInfo?.interests &&
                     resumeData.additionalInfo.interests.length > 0 && (
-                      <div>
+                      <div className="break-words">
                         <span
                           className="font-semibold text-purple-700"
                           style={{ printColorAdjust: "exact" }}
@@ -375,7 +385,7 @@ export default function ResumeViewer({ resumeData, password }) {
                   {(resumeData.contact.website ||
                     resumeData.contact.social?.behance ||
                     resumeData.contact.social?.behance2) && (
-                    <div>
+                    <div className="break-words">
                       <span
                         className="font-semibold text-purple-700"
                         style={{ printColorAdjust: "exact" }}
@@ -384,7 +394,7 @@ export default function ResumeViewer({ resumeData, password }) {
                       </span>{" "}
                       {resumeData.contact.website && (
                         <span
-                          className="text-purple-600"
+                          className="text-purple-600 break-all"
                           style={{ printColorAdjust: "exact" }}
                         >
                           {resumeData.contact.website}
@@ -392,16 +402,16 @@ export default function ResumeViewer({ resumeData, password }) {
                       )}
                       {resumeData.contact.social?.behance && (
                         <span
-                          className="text-purple-600"
+                          className="text-purple-600 block sm:inline print:inline"
                           style={{ printColorAdjust: "exact" }}
                         >
-                          {" "}
-                          • behance.net/aparnamunagekar
+                          {resumeData.contact.website ? " • " : ""}
+                          behance.net/aparnamunagekar
                         </span>
                       )}
                       {resumeData.contact.social?.behance2 && (
                         <span
-                          className="text-purple-600"
+                          className="text-purple-600 block sm:inline print:inline"
                           style={{ printColorAdjust: "exact" }}
                         >
                           {" "}
@@ -417,7 +427,7 @@ export default function ResumeViewer({ resumeData, password }) {
         </div>
       </div>
 
-      {/* Print Styles with Color Preservation */}
+      {/* Print Styles with Color Preservation - UNCHANGED */}
       <style jsx global>{`
         @media print {
           @page {
