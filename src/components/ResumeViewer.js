@@ -32,10 +32,10 @@ export default function ResumeViewer({ resumeData, password }) {
           >
             Print Resume
           </button>
-          <ResumeDownload />
+          {/* <ResumeDownload />
           {password && (
             <PDFGenerator resumeData={resumeData} password={password} />
-          )}
+          )} */}
         </div>
       )}
 
