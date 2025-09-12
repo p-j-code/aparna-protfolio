@@ -61,7 +61,7 @@ export default function ResumeViewer({ resumeData, password }) {
             {/* Header Section */}
             <header className="text-center mb-6 pb-4 print:mb-4 print:pb-3">
               <h1
-                className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent mb-2 tracking-tight print:text-3xl"
+                className="text-4xl font-bold text-purple-500 bg-clip-text text-transparent mb-2 tracking-tight print:text-3xl"
                 style={{
                   printColorAdjust: "exact",
                   WebkitPrintColorAdjust: "exact",
