@@ -1,6 +1,6 @@
 "use server";
 
-import { put, list } from "@vercel/blob";
+import { put, list, del } from "@vercel/blob";
 import { promises as fs } from "fs";
 import path from "path";
 
@@ -16,7 +16,11 @@ export async function getResumeData() {
       try {
         const { blobs } = await list({ prefix: "resume-data" });
         if (blobs.length > 0) {
-          const response = await fetch(blobs[0].url);
+          // Get the most recent blob
+          const sortedBlobs = blobs.sort(
+            (a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt)
+          );
+          const response = await fetch(sortedBlobs[0].url);
           return await response.json();
         }
       } catch (error) {
@@ -32,7 +36,7 @@ export async function getResumeData() {
       await put("resume-data.json", JSON.stringify(defaultData), {
         access: "public",
         contentType: "application/json",
-        allowOverwrite: true,
+        addRandomSuffix: false,
       });
 
       return defaultData;
@@ -56,18 +60,28 @@ export async function getResumeData() {
 export async function updateResumeData(newData) {
   try {
     if (isProduction) {
-      // Save to Vercel Blob with overwrite enabled
+      // Delete old blob if exists
+      try {
+        const { blobs } = await list({ prefix: "resume-data.json" });
+        for (const blob of blobs) {
+          await del(blob.url);
+        }
+      } catch (error) {
+        console.log("No existing blob to delete");
+      }
+
+      // Save new data to Vercel Blob
       const blob = await put(
         "resume-data.json",
         JSON.stringify(newData, null, 2),
         {
           access: "public",
           contentType: "application/json",
-          allowOverwrite: true,
+          addRandomSuffix: false,
         }
       );
 
-      // Optional: Create backup with unique timestamp
+      // Create backup with unique timestamp
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
       await put(
         `backups/resume-data-${timestamp}.json`,
@@ -75,14 +89,17 @@ export async function updateResumeData(newData) {
         {
           access: "public",
           contentType: "application/json",
+          addRandomSuffix: false,
         }
       );
 
-      return { success: true };
+      console.log("Resume data updated successfully in blob storage");
+      return { success: true, url: blob.url };
     } else {
       // Development: save to file system
       const filePath = path.join(process.cwd(), "src/data/resume-data.json");
       await fs.writeFile(filePath, JSON.stringify(newData, null, 2), "utf8");
+      console.log("Resume data updated successfully in file system");
       return { success: true };
     }
   } catch (error) {

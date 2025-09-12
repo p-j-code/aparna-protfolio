@@ -9,6 +9,7 @@ export default function ResumePageClient({ initialData }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [mode, setMode] = useState("view"); // 'view' or 'edit'
+  const [resumeData, setResumeData] = useState(initialData); // Add state for resume data
 
   // Check if user has password in session storage
   useEffect(() => {
@@ -33,6 +34,12 @@ export default function ResumePageClient({ initialData }) {
 
   const toggleMode = () => {
     setMode(mode === "view" ? "edit" : "view");
+  };
+
+  // Add callback to update data after successful save
+  const handleDataUpdate = (newData) => {
+    setResumeData(newData);
+    setMode("view"); // Switch back to view mode after saving
   };
 
   // Show authentication screen if not authenticated
@@ -60,9 +67,13 @@ export default function ResumePageClient({ initialData }) {
       </div>
 
       {mode === "view" ? (
-        <ResumeViewer resumeData={initialData} password={password} />
+        <ResumeViewer resumeData={resumeData} password={password} />
       ) : (
-        <ResumeEditor initialData={initialData} password={password} />
+        <ResumeEditor
+          initialData={resumeData}
+          password={password}
+          onDataUpdate={handleDataUpdate} // Pass callback
+        />
       )}
     </div>
   );

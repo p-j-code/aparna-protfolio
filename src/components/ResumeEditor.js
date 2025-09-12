@@ -68,7 +68,7 @@ export default function ResumeEditor({ initialData, password }) {
     setResumeData(newData);
   };
 
-  // Save changes
+  // Save changes - UPDATED VERSION
   const saveChanges = async () => {
     setIsSaving(true);
     setMessage({ text: "", type: "" });
@@ -89,8 +89,19 @@ export default function ResumeEditor({ initialData, password }) {
 
       if (result.success) {
         setMessage({ text: "Resume updated successfully!", type: "success" });
-        router.refresh();
+
+        // Call the onDataUpdate callback if provided
+        if (onDataUpdate) {
+          onDataUpdate(resumeData);
+        }
+
+        // No need to refresh router, just update state
         setIsEditing(false);
+
+        // Clear success message after 3 seconds
+        setTimeout(() => {
+          setMessage({ text: "", type: "" });
+        }, 3000);
       } else {
         setMessage({
           text: result.message || "Failed to update resume",
