@@ -169,7 +169,6 @@ export default function ResumeViewer({
                     style={{ printColorAdjust: "exact" }}
                   >
                     {" "}
-                    (10, 12, and 24 colour pencils)
                   </span>
                 )}
               </p>
