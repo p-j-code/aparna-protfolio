@@ -390,7 +390,7 @@ export default function ResumeEditor({ initialData, password, onDataUpdate }) {
                         onChange={(e) =>
                           handleChange("contact.website", e.target.value)
                         }
-                        placeholder="aparna-portfolio.vercel.app"
+                        placeholder="aparna-protfolio.vercel.app"
                         className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm sm:text-base"
                       />
                     ) : (
