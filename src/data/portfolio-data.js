@@ -60,44 +60,71 @@ export const portfolioData = {
     },
     {
       id: 2,
-      title: "Children's Book Series",
-      category: "Publication Design",
-      description:
-        "Illustrated book covers featured at the 2025 Mumbai Book Fair",
-      longDescription:
-        "Created a series of illustrated book covers that combine hand-drawn illustrations with modern typography. These designs were featured at the prestigious 2025 Mumbai Book Fair.",
-      tags: ["Illustration", "Typography", "Book Design"],
-      stats: "Mumbai Book Fair 2025",
-      featured: true,
-      images: [],
-      color: "from-purple-500 to-pink-500",
-    },
-    {
-      id: 3,
-      title: "World Environment Day",
+      title: "Camlin - A Medium That Brings Positivity",
       category: "Campaign Design",
       description:
-        "Poster series for environmental awareness achieving viral organic reach",
+        "Creative campaign promoting positivity and self-expression through Camlin's range of artistic products",
       longDescription:
-        "Designed a poster series for World Environment Day 2025 that combined bold typography with environmental themes. The campaign achieved significant organic reach on social media.",
-      tags: ["Poster Design", "Social Impact", "Typography"],
-      stats: "20,000+ shares",
+        "In a world filled with challenges, Camlin aims to be more than just a brand; It seeks to be a light of positivity. Through the lens of creativity, Camlin inspires individuals to channel their inner positivity and express it through various mediums. This campaign centers on promoting creativity and self-expression through their range of artistic products. It is not just a campaign; it's a movement aimed at inspiring individuals to embrace positivity through creative expression.",
+      tags: ["Campaign Design", "Brand Identity", "Social Impact"],
+      stats: "National Brand Campaign",
       featured: true,
-      images: [],
-      color: "from-green-500 to-teal-500",
+      images: [
+        "/projects/camlin/campaign%20media%201%20and%202-01.jpg",
+        "/projects/camlin/campaign%20media%201%20and%202-02.jpg",
+        "/projects/camlin/campaign%20media%201%20and%202-03.jpg",
+        "/projects/camlin/campaign%20media%201%20and%202-04.jpg",
+        "/projects/camlin/campaign%20media%201%20and%202-05.jpg",
+        "/projects/camlin/campaign%20media%201%20and%202-06.jpg",
+        "/projects/camlin/campaign%20media%201%20and%202-07.jpg",
+        "/projects/camlin/campaign%20media%201%20and%202-08.jpg",
+        "/projects/camlin/campaign%20media%201%20and%202-09.jpg",
+      ],
+      color: "from-orange-500 to-rose-500",
     },
+
+    {
+      id: 3,
+      title: "Amul - Every Indian Deserves the Taste",
+      category: "Packaging Design",
+      description:
+        "Rebranding campaign celebrating India's unsung heroes through chocolate packaging, honoring farmers, vendors, and artisans who define 'The Taste of India'",
+      longDescription:
+        "Amul, renowned for its diverse product range, symbolises 'The Taste of India' celebrating the nation's rich flavours and accessibility for all. Drawing inspiration from India's varied communities, including farmers, vendors and artisans, we aim to honor their contribution by portraying their stories on our packaging. By spotlighting the unsung heroes behind our daily lives, we glorify the country's livelihood and redefine Amul as more than just a sensory experience, but a tribute to India's diverse essence. Amul acknowledges the bhelwala as a tribute to the cultural significance of street food in India. By recognizing the bhelwala, Amul not only pays homage to a cherished aspect of Indian street food culture but also celebrates the hard work and contribution of these vendors to the culinary landscape of the country.",
+      tags: ["Packaging", "Rebranding", "Social Impact", "Cultural Heritage"],
+      stats: "National Chocolate Brand Campaign",
+      featured: true,
+      images: [
+        "/projects/amul/layout%201-01.jpg",
+        "/projects/amul/layout%202-01.jpg",
+        "/projects/amul/layout%203-01.jpg",
+        "/projects/amul/layout%204-01.jpg",
+        "/projects/amul/layout%205-01.jpg",
+      ],
+      color: "from-blue-600 to-red-500",
+    },
+
     {
       id: 4,
-      title: "SME Brand Redesigns",
-      category: "Brand Identity",
-      description: "Complete rebranding for 3 small-to-medium enterprises",
+      title: "Typography through Publication",
+      category: "Publication Design",
+      description:
+        "Typographic book cover designs that use creative text arrangements to convey stories, featuring metaphorical alphabet compositions",
       longDescription:
-        "Led complete rebranding projects for three SMEs, including logo redesign, brand guidelines development, and marketing collateral creation. Successfully aligned visuals with updated market positioning.",
-      tags: ["Logo Design", "Brand Guidelines", "Visual Identity"],
-      stats: "3 successful launches",
+        "A typographic book cover uses different styles, sizes and arrangements of letters and words to create a visually appealing design. Instead of relying on images or illustration, it focuses on the art of arranging text creatively. This involves playing with fonts, spacing, colours and layout to convey the mood, theme or essence of the book. 'Calling Sehmat' by Harinder Sikka, inspired by the story of a freedom fighter, utilizes metaphors to illustrate the profound intricacies of life, with the arrangement of alphabets serving as a reflection of this profound narrative thread throughout the book.",
+      tags: [
+        "Typography",
+        "Book Design",
+        "Publication Design",
+        "Conceptual Design",
+      ],
+      stats: "Featured Book Cover Designs",
       featured: true,
-      images: [],
-      color: "from-blue-500 to-indigo-500",
+      images: [
+        "/projects/typography/calling-sehmat.jpg",
+        "/projects/typography/samantar-book.jpg",
+      ],
+      color: "from-slate-700 to-amber-600",
     },
   ],
   skills: [
