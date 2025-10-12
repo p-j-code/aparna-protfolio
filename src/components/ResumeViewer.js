@@ -410,7 +410,7 @@ export default function ResumeViewer({
                           <span className="sm:hidden print:hidden">
                             {resumeData.contact.website ? "• " : ""}
                           </span>
-                          behance.net/aparnamunagekar
+                          behance.net/aparnamunagekar1
                         </span>
                       )}
                       {resumeData.contact.social?.behance2 && (
@@ -419,7 +419,7 @@ export default function ResumeViewer({
                           style={{ printColorAdjust: "exact" }}
                         >
                           <span className="print:inline"> • </span>
-                          behance.net/aparnamunagekar1
+                          behance.net/aparnamunagekar
                         </span>
                       )}
                     </div>
