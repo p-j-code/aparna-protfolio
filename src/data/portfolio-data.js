@@ -101,7 +101,7 @@ export const portfolioData = {
         "/projects/amul/layout%204-01.jpg",
         "/projects/amul/layout%205-01.jpg",
       ],
-      color: "from-blue-600 to-red-500",
+      color: "from-orange-500 to-rose-500",
     },
 
     {
