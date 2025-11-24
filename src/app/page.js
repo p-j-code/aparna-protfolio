@@ -29,7 +29,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50">
       {/* Animated Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      {/* <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div
           className="absolute w-96 h-96 bg-gradient-to-r from-pink-300/20 to-purple-300/20 rounded-full blur-3xl transition-transform duration-700"
           style={{
@@ -46,7 +46,7 @@ export default function Home() {
             }px)`,
           }}
         />
-      </div>
+      </div> */}
 
       <Navbar scrollY={scrollY} activeSection={activeSection} />
       <Hero />
