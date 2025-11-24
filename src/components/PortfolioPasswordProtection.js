@@ -1,6 +1,7 @@
 "use client";
 
 import { checkPortfolioPassword } from "@/lib/portfolio-utils";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 
 /**
@@ -86,9 +87,9 @@ export default function PortfolioPasswordProtection({
           )}
           {isAdminRoute && (
             <p className="mt-1 text-xs text-purple-600">
-              <a href="/" className="underline hover:text-purple-800">
+              <Link href="/" className="underline hover:text-purple-800">
                 Return to public view
-              </a>
+              </Link>
             </p>
           )}
         </div>

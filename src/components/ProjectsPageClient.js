@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import PortfolioPasswordProtection from "@/components/PortfolioPasswordProtection";
 import ProjectsEditor from "@/components/ProjectsEditor";
+import Link from "next/link";
 
 export default function ProjectsPageClient({
   initialData,
@@ -61,12 +62,12 @@ export default function ProjectsPageClient({
                 Sign Out
               </button>
 
-              <a
+              <Link
                 href="/"
                 className="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded shadow-lg transition-all hover:shadow-xl inline-block"
               >
                 Back to Portfolio
-              </a>
+              </Link>
             </>
           )}
         </div>
@@ -105,7 +106,7 @@ export default function ProjectsPageClient({
                 </div>
               </button>
 
-              <a
+              <Link
                 href="/"
                 className="flex items-center justify-end gap-3 bg-white rounded-full shadow-lg pr-2 transition-all hover:shadow-xl"
               >
@@ -127,7 +128,7 @@ export default function ProjectsPageClient({
                     />
                   </svg>
                 </div>
-              </a>
+              </Link>
             </>
           )}
         </div>
