@@ -1590,12 +1590,25 @@ export default function Projects() {
   }, []);
 
   // Orbital animation - stop when modal is open
+  // Orbital animation - stop when modal is open
   useEffect(() => {
     if (currentLayout === LAYOUTS.ORBITAL && !selectedProject) {
-      const interval = setInterval(() => {
-        setOrbitalRotation((prev) => (prev + 0.15) % 360);
-      }, 50);
-      return () => clearInterval(interval);
+      let animationId;
+      let lastTime = performance.now();
+
+      const animate = (currentTime) => {
+        const deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+
+        // Rotate at consistent speed regardless of frame rate
+        const rotationSpeed = 0.003; // degrees per millisecond
+        setOrbitalRotation((prev) => (prev + deltaTime * rotationSpeed) % 360);
+
+        animationId = requestAnimationFrame(animate);
+      };
+
+      animationId = requestAnimationFrame(animate);
+      return () => cancelAnimationFrame(animationId);
     }
   }, [currentLayout, selectedProject]);
 
