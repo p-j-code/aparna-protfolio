@@ -95,7 +95,7 @@ const MissingImageDisplay = memo(({ project, index = 0, className = "" }) => {
 MissingImageDisplay.displayName = "MissingImageDisplay";
 
 // ============================================================================
-// PROJECT CARD - Memoized with CSS-only hover effects
+// PROJECT CARD - Memoized with CSS-only hover effects and stable image loading
 // ============================================================================
 const ProjectCard = memo(
   ({
@@ -108,24 +108,48 @@ const ProjectCard = memo(
     isLiked,
     hasError,
   }) => {
+    const [imgLoaded, setImgLoaded] = useState(false);
+    const [imgError, setImgError] = useState(hasError);
+
+    // Update error state if prop changes
+    useEffect(() => {
+      setImgError(hasError);
+    }, [hasError]);
+
     return (
       <div
         className={`group cursor-pointer relative overflow-hidden transition-all duration-500 ${className}`}
         style={style}
         onClick={() => onSelect(project)}
       >
+        {/* Stable background gradient - prevents flash when image loads */}
+        <div
+          className={`absolute inset-0 bg-gradient-to-br ${
+            project.color || "from-amber-500 via-rose-500 to-violet-600"
+          }`}
+        />
+
         <div className="relative w-full h-full">
-          {project.images?.[0] && !hasError ? (
-            <Image
-              src={project.images[0]}
-              alt={project.title}
-              fill
-              className="object-cover transition-transform duration-700 group-hover:scale-110"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              loading="lazy"
-              placeholder="blur"
-              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAIhAAAgEDAwUBAAAAAAAAAAAAAQIDAAQRBRIhBhMiMWFx/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAZEQADAAMAAAAAAAAAAAAAAAAAAQIRITH/2gAMAwEAAhEDEQA/AKOn9R6hY2ENnHHbGOJAi7o2JwBgZO7k/aqf+oaj/Eo/qUplTpLof//Z"
-            />
+          {project.images?.[0] && !imgError ? (
+            <>
+              {/* Use native img tag for mobile stability - prevents lazy loading issues */}
+              <img
+                src={project.images[0]}
+                alt={project.title}
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${
+                  imgLoaded ? "opacity-100" : "opacity-0"
+                }`}
+                onLoad={() => setImgLoaded(true)}
+                onError={() => setImgError(true)}
+                draggable={false}
+              />
+              {/* Loading spinner while image loads */}
+              {!imgLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-6 h-6 border-2 border-white/30 border-t-white/80 rounded-full animate-spin" />
+                </div>
+              )}
+            </>
           ) : (
             <MissingImageDisplay project={project} index={0} />
           )}
@@ -1609,15 +1633,14 @@ export default function Projects() {
                 onClick={() => handleSelectProject(p)}
               >
                 <div className="bg-white p-2 pb-10 shadow-xl hover:shadow-2xl transition-all duration-300 relative rounded-sm group-hover:rotate-0 group-hover:scale-105 group-hover:-translate-y-5 group-hover:z-50">
-                  <div className="relative aspect-square overflow-hidden">
+                  <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-amber-100 to-rose-100">
                     {p.images?.[0] && !isImageError(p.id, 0) ? (
-                      <Image
+                      <img
                         src={p.images[0]}
                         alt={p.title}
-                        fill
-                        className="object-cover"
+                        className="absolute inset-0 w-full h-full object-cover"
                         onError={() => handleImageError(p.id, 0)}
-                        loading="lazy"
+                        draggable={false}
                       />
                     ) : (
                       <MissingImageDisplay project={p} index={0} />
@@ -1666,14 +1689,18 @@ export default function Projects() {
             className="relative z-20 w-44 h-44 md:w-56 md:h-56 rounded-full overflow-hidden shadow-2xl ring-4 ring-white cursor-pointer hover:scale-105 transition-transform duration-300"
             onClick={(e) => handleProjectClick(centerProject, e)}
           >
+            <div
+              className={`absolute inset-0 bg-gradient-to-br ${
+                centerProject.color || "from-amber-500 to-rose-500"
+              }`}
+            />
             {centerProject.images?.[0] && !isImageError(centerProject.id, 0) ? (
-              <Image
+              <img
                 src={centerProject.images[0]}
                 alt={centerProject.title}
-                fill
-                className="object-cover"
+                className="absolute inset-0 w-full h-full object-cover"
                 onError={() => handleImageError(centerProject.id, 0)}
-                loading="lazy"
+                draggable={false}
               />
             ) : (
               <MissingImageDisplay project={centerProject} index={0} />
@@ -1720,14 +1747,18 @@ export default function Projects() {
                 !selectedProject && setActiveOrbitalProject(null)
               }
             >
+              <div
+                className={`absolute inset-0 bg-gradient-to-br ${
+                  p.color || "from-amber-500 to-rose-500"
+                }`}
+              />
               {p.images?.[0] && !isImageError(p.id, 0) ? (
-                <Image
+                <img
                   src={p.images[0]}
                   alt={p.title}
-                  fill
-                  className="object-cover"
+                  className="absolute inset-0 w-full h-full object-cover"
                   onError={() => handleImageError(p.id, 0)}
-                  loading="lazy"
+                  draggable={false}
                 />
               ) : (
                 <MissingImageDisplay project={p} index={0} />
