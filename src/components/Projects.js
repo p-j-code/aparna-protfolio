@@ -1303,7 +1303,35 @@ const ProjectDetailView = ({
             <button
               type="button"
               tabIndex={-1}
-              className="p-2.5 md:p-3 bg-white/10 text-white/80 hover:text-white rounded-full"
+              onClick={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const shareUrl = `${window.location.origin}${window.location.pathname}?project=${project.id}`;
+                const shareData = {
+                  title: project.title,
+                  text: project.description,
+                  url: shareUrl,
+                };
+
+                try {
+                  if (navigator.share && navigator.canShare?.(shareData)) {
+                    await navigator.share(shareData);
+                  } else {
+                    await navigator.clipboard.writeText(shareUrl);
+                    alert("Link copied to clipboard!");
+                  }
+                } catch (err) {
+                  if (err.name !== "AbortError") {
+                    try {
+                      await navigator.clipboard.writeText(shareUrl);
+                      alert("Link copied to clipboard!");
+                    } catch {
+                      console.error("Failed to share:", err);
+                    }
+                  }
+                }
+              }}
+              className="p-2.5 md:p-3 bg-white/10 text-white/80 hover:text-white hover:bg-white/20 rounded-full transition-all"
             >
               <Share2 className="w-4 h-4" />
             </button>
