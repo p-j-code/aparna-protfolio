@@ -688,18 +688,34 @@ const ProjectDetailView = ({
     const [showInfo, setShowInfo] = useState(false);
     const [showMobileInfo, setShowMobileInfo] = useState(false);
     const dragStartTime = useRef(0);
+    const lastX = useRef(0);
+    const velocity = useRef(0);
+    const lastTime = useRef(0);
+    const dragStartPos = useRef({ x: 0, y: 0 });
 
     // Sync with parent state
     useEffect(() => {
       setActiveIndex(currentImageIndex);
     }, [currentImageIndex]);
 
+    const getSpacing = () => {
+      const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+      return isMobile ? 140 : 260;
+    };
+
     const handleMouseDown = (e) => {
       if (isAnimating) return;
+      const clientX = e.clientX || e.touches?.[0]?.clientX || 0;
+      const clientY = e.clientY || e.touches?.[0]?.clientY || 0;
+
       setIsDragging(true);
       setHasDragged(false);
       dragStartTime.current = Date.now();
-      setStartX(e.clientX || e.touches?.[0]?.clientX || 0);
+      lastTime.current = Date.now();
+      setStartX(clientX);
+      lastX.current = clientX;
+      dragStartPos.current = { x: clientX, y: clientY };
+      velocity.current = 0;
       setDragOffset(0);
     };
 
@@ -707,6 +723,18 @@ const ProjectDetailView = ({
       if (!isDragging || isAnimating) return;
       const currentX = e.clientX || e.touches?.[0]?.clientX || 0;
       const diff = currentX - startX;
+
+      // Calculate velocity for momentum
+      const now = Date.now();
+      const dt = now - lastTime.current;
+      if (dt > 0) {
+        const dx = currentX - lastX.current;
+        // Smooth velocity with weighted average
+        velocity.current = velocity.current * 0.7 + (dx / dt) * 0.3;
+      }
+      lastX.current = currentX;
+      lastTime.current = now;
+
       if (Math.abs(diff) > 5) {
         setHasDragged(true);
       }
@@ -720,19 +748,34 @@ const ProjectDetailView = ({
       const wasDragging =
         hasDragged || Math.abs(dragOffset) > 10 || dragDuration > 150;
 
-      if (Math.abs(dragOffset) > 80) {
-        if (dragOffset < 0) {
-          goToImage((activeIndex + 1) % images.length);
-        } else {
-          goToImage((activeIndex - 1 + images.length) % images.length);
-        }
+      const spacing = getSpacing();
+
+      // Calculate items to move based on drag distance + velocity momentum
+      const velocityBoost = velocity.current * 120; // Momentum multiplier
+      const totalOffset = dragOffset + velocityBoost;
+
+      // Calculate how many items to skip
+      let itemsToMove = 0;
+      if (Math.abs(totalOffset) > 40) {
+        // Lower threshold for responsiveness
+        itemsToMove = Math.round(totalOffset / spacing);
+        // Clamp to reasonable range (-5 to 5 items)
+        itemsToMove = Math.max(-5, Math.min(5, itemsToMove));
+      }
+
+      if (itemsToMove !== 0) {
+        // Negative offset (drag left) = go forward, positive = go backward
+        const newIndex =
+          (activeIndex - itemsToMove + images.length * 10) % images.length;
+        goToImage(newIndex);
       }
 
       setIsDragging(false);
       setDragOffset(0);
+      velocity.current = 0;
 
       if (wasDragging) {
-        setTimeout(() => setHasDragged(false), 200);
+        setTimeout(() => setHasDragged(false), 100);
       } else {
         setHasDragged(false);
       }
@@ -740,9 +783,7 @@ const ProjectDetailView = ({
 
     const handleMouseLeave = () => {
       if (!isDragging) return;
-      setIsDragging(false);
-      setDragOffset(0);
-      setTimeout(() => setHasDragged(false), 200);
+      handleMouseUp();
     };
 
     const goToImage = (idx) => {
@@ -750,13 +791,25 @@ const ProjectDetailView = ({
       setIsAnimating(true);
       setActiveIndex(idx);
       setCurrentImageIndex(idx);
-      setTimeout(() => setIsAnimating(false), 600);
+      // Faster animation for snappier feel
+      setTimeout(() => setIsAnimating(false), 350);
     };
 
+    // Improved card click handler - works for any card
     const handleCardClick = (idx, e) => {
       e.preventDefault();
       e.stopPropagation();
-      if (!hasDragged && !isDragging) {
+
+      // Check if this was actually a drag, not a click
+      const clientX = e.clientX || 0;
+      const clientY = e.clientY || 0;
+      const distanceMoved = Math.sqrt(
+        Math.pow(clientX - dragStartPos.current.x, 2) +
+          Math.pow(clientY - dragStartPos.current.y, 2)
+      );
+
+      // Only navigate if it was a genuine click (minimal movement)
+      if (!hasDragged && !isDragging && distanceMoved < 10) {
         goToImage(idx);
       }
     };
@@ -781,31 +834,33 @@ const ProjectDetailView = ({
       const totalCards = images.length;
       let diff = idx - activeIndex;
 
+      // Handle wrapping for circular carousel
       if (diff > totalCards / 2) diff -= totalCards;
       if (diff < -totalCards / 2) diff += totalCards;
 
-      const dragInfluence = isDragging ? dragOffset / 300 : 0;
+      const spacing = getSpacing();
+
+      // Smooth drag influence - 1:1 mapping with finger movement
+      const dragInfluence = isDragging ? dragOffset / spacing : 0;
       const adjustedDiff = diff + dragInfluence;
 
       const absPos = Math.abs(adjustedDiff);
       const isCenter = absPos < 0.5;
 
-      const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-      const spacing = isMobile ? 140 : 260;
-
       const translateX = adjustedDiff * spacing;
-      const translateZ = isCenter ? 80 : -absPos * 80;
-      const rotateY = adjustedDiff * -20;
-      const scale = isCenter ? 1.05 : Math.max(0.75, 1 - absPos * 0.15);
-      const opacity = Math.max(0.4, 1 - absPos * 0.25);
+      const translateZ = isCenter ? 80 : -absPos * 60;
+      const rotateY = adjustedDiff * -18;
+      const scale = isCenter ? 1.05 : Math.max(0.7, 1 - absPos * 0.12);
+      const opacity = Math.max(0.3, 1 - absPos * 0.2);
 
       return {
         transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
         opacity,
-        zIndex: 10 - Math.floor(absPos),
+        zIndex: 100 - Math.floor(absPos * 10),
         transition: isDragging
           ? "none"
-          : "all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)",
+          : "all 0.35s cubic-bezier(0.4, 0.0, 0.2, 1)", // Material Design easing
+        pointerEvents: "auto", // Ensure all cards are clickable
       };
     };
 
@@ -838,11 +893,18 @@ const ProjectDetailView = ({
               return (
                 <div
                   key={idx}
-                  className={`absolute rounded-2xl overflow-hidden shadow-2xl cursor-pointer select-none transition-all duration-500 ${
+                  className={`absolute rounded-2xl overflow-hidden shadow-2xl select-none
+                  ${
                     isActive
                       ? "ring-4 ring-white/60"
-                      : "hover:ring-2 hover:ring-white/30"
-                  }`}
+                      : "ring-0 hover:ring-2 hover:ring-white/40"
+                  }
+                  ${
+                    !isActive
+                      ? "cursor-pointer"
+                      : "cursor-grab active:cursor-grabbing"
+                  }
+                `}
                   style={{
                     ...style,
                     width: "auto",
@@ -851,6 +913,13 @@ const ProjectDetailView = ({
                     maxHeight: showMobileInfo ? "50vh" : "70vh",
                   }}
                   onClick={(e) => handleCardClick(idx, e)}
+                  onMouseDown={(e) => {
+                    // Track start position for click detection
+                    dragStartPos.current = {
+                      x: e.clientX,
+                      y: e.clientY,
+                    };
+                  }}
                 >
                   {img && !isImageError(idx) ? (
                     <div className="relative bg-black/40 backdrop-blur-sm rounded-2xl overflow-hidden">
@@ -933,7 +1002,7 @@ const ProjectDetailView = ({
                 e.stopPropagation();
                 if (!hasDragged) goToImage(idx);
               }}
-              className={`h-2 rounded-full transition-all duration-500 ${
+              className={`h-2 rounded-full transition-all duration-300 ${
                 idx === activeIndex
                   ? "w-8 bg-white"
                   : "w-2 bg-white/40 hover:bg-white/60"
