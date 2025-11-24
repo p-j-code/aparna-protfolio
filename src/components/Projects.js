@@ -51,13 +51,13 @@ const layoutConfig = {
 };
 
 const DETAIL_MODES = {
-  SHOWCASE: "showcase",
+  // SHOWCASE: "showcase",
   CAROUSEL: "carousel",
   SCROLL: "scroll",
 };
 
 const detailModeConfig = {
-  [DETAIL_MODES.SHOWCASE]: { icon: Layout, name: "Showcase" },
+  // [DETAIL_MODES.SHOWCASE]: { icon: Layout, name: "Showcase" },
   [DETAIL_MODES.CAROUSEL]: { icon: Layers, name: "Carousel" },
   [DETAIL_MODES.SCROLL]: { icon: Grid, name: "Scroll" },
 };
@@ -225,7 +225,7 @@ const ProjectDetailView = ({
   filteredProjects,
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [detailMode, setDetailMode] = useState(DETAIL_MODES.SHOWCASE);
+  const [detailMode, setDetailMode] = useState(DETAIL_MODES.CAROUSEL);
   const [isPlaying, setIsPlaying] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [touchStart, setTouchStart] = useState(null);
@@ -1234,7 +1234,7 @@ const ProjectDetailView = ({
                     e.preventDefault();
                     e.stopPropagation();
                     setCurrentImageIndex(idx);
-                    setDetailMode(DETAIL_MODES.SHOWCASE);
+                    setDetailMode(DETAIL_MODES.CAROUSEL);
                   }}
                   className="absolute top-4 right-4 bg-white/90 hover:bg-white p-2.5 rounded-full shadow-lg z-10 transition-transform hover:scale-110"
                 >
@@ -1346,14 +1346,14 @@ const ProjectDetailView = ({
 
   const renderDetailMode = () => {
     switch (detailMode) {
-      case DETAIL_MODES.SHOWCASE:
-        return <ShowcaseMode />;
+      // case DETAIL_MODES.SHOWCASE:
+      //   return <ShowcaseMode />;
       case DETAIL_MODES.CAROUSEL:
         return <CarouselMode />;
       case DETAIL_MODES.SCROLL:
         return <ScrollMode />;
       default:
-        return <ShowcaseMode />;
+        return <CarouselMode />;
     }
   };
 
