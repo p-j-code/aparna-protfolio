@@ -36,6 +36,20 @@
   .animate-delay-300 {
     animation-delay: 300ms;
   }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-none {
+    display: block;
+    -webkit-line-clamp: none;
+    -webkit-box-orient: horizontal;
+    overflow: visible;
+  }
 }
 
 .scrollbar-thin::-webkit-scrollbar {

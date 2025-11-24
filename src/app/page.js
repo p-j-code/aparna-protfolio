@@ -17,14 +17,14 @@ export default function Home() {
   const scrollY = useScrollPosition();
   const activeSection = useActiveSection();
 
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
+  // useEffect(() => {
+  //   const handleMouseMove = (e) => {
+  //     setMousePosition({ x: e.clientX, y: e.clientY });
+  //   };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+  //   window.addEventListener("mousemove", handleMouseMove);
+  //   return () => window.removeEventListener("mousemove", handleMouseMove);
+  // }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50">
