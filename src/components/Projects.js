@@ -63,6 +63,115 @@ const detailModeConfig = {
 };
 
 // ============================================================================
+// IMAGE CACHE - Prevents reloading of images
+// ============================================================================
+const imageCache = new Map();
+
+const preloadImage = (src) => {
+  if (!src || imageCache.has(src)) return Promise.resolve();
+
+  return new Promise((resolve, reject) => {
+    const img = new window.Image();
+    img.onload = () => {
+      imageCache.set(src, true);
+      resolve();
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
+};
+
+// ============================================================================
+// STABLE IMAGE COMPONENT - Prevents blinking on mobile
+// ============================================================================
+const StableImage = memo(
+  ({
+    src,
+    alt,
+    className = "",
+    onError,
+    fallbackGradient = "from-amber-500 via-rose-500 to-violet-600",
+  }) => {
+    const [status, setStatus] = useState(() =>
+      imageCache.has(src) ? "loaded" : "loading"
+    );
+    const imgRef = useRef(null);
+    const mountedRef = useRef(true);
+
+    useEffect(() => {
+      mountedRef.current = true;
+
+      if (!src) {
+        setStatus("error");
+        return;
+      }
+
+      // If already cached, mark as loaded immediately
+      if (imageCache.has(src)) {
+        setStatus("loaded");
+        return;
+      }
+
+      // Preload the image
+      const img = new window.Image();
+      img.onload = () => {
+        if (mountedRef.current) {
+          imageCache.set(src, true);
+          setStatus("loaded");
+        }
+      };
+      img.onerror = () => {
+        if (mountedRef.current) {
+          setStatus("error");
+          onError?.();
+        }
+      };
+      img.src = src;
+
+      return () => {
+        mountedRef.current = false;
+      };
+    }, [src, onError]);
+
+    if (status === "error" || !src) {
+      return null; // Let parent handle fallback
+    }
+
+    return (
+      <>
+        {/* Always render the image element to prevent DOM changes */}
+        <img
+          ref={imgRef}
+          src={src}
+          alt={alt}
+          className={`${className} ${
+            status === "loaded" ? "opacity-100" : "opacity-0"
+          }`}
+          style={{
+            // CSS hints to prevent browser from unloading the image
+            willChange: "transform",
+            backfaceVisibility: "hidden",
+            transform: "translateZ(0)",
+            WebkitBackfaceVisibility: "hidden",
+            WebkitTransform: "translateZ(0)",
+          }}
+          draggable={false}
+          loading="eager"
+          decoding="async"
+        />
+        {/* Loading state */}
+        {status === "loading" && (
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <div className="w-6 h-6 border-2 border-white/30 border-t-white/80 rounded-full animate-spin" />
+          </div>
+        )}
+      </>
+    );
+  }
+);
+StableImage.displayName = "StableImage";
+
+// ============================================================================
 // PLACEHOLDER COMPONENT - Moved outside to prevent re-creation
 // ============================================================================
 const MissingImageDisplay = memo(({ project, index = 0, className = "" }) => {
@@ -95,70 +204,77 @@ const MissingImageDisplay = memo(({ project, index = 0, className = "" }) => {
 MissingImageDisplay.displayName = "MissingImageDisplay";
 
 // ============================================================================
-// PROJECT CARD - Memoized with CSS-only hover effects and stable image loading
+// PROJECT CARD - Memoized with stable image loading
 // ============================================================================
 const ProjectCard = memo(
   ({
     project,
-    index,
-    style = {},
-    className = "",
     onSelect,
     onToggleLike,
     isLiked,
     hasError,
+    onImageError,
+    className = "",
+    style = {},
   }) => {
-    const [imgLoaded, setImgLoaded] = useState(false);
-    const [imgError, setImgError] = useState(hasError);
+    const [localError, setLocalError] = useState(hasError);
+    const imageSrc = project.images?.[0];
 
-    // Update error state if prop changes
-    useEffect(() => {
-      setImgError(hasError);
-    }, [hasError]);
+    const handleError = useCallback(() => {
+      setLocalError(true);
+      onImageError?.(project.id, 0);
+    }, [project.id, onImageError]);
+
+    const handleClick = useCallback(() => {
+      onSelect(project);
+    }, [onSelect, project]);
+
+    const handleLikeClick = useCallback(
+      (e) => {
+        e.stopPropagation();
+        onToggleLike(project.id);
+      },
+      [onToggleLike, project.id]
+    );
 
     return (
       <div
-        className={`group cursor-pointer relative overflow-hidden transition-all duration-500 ${className}`}
-        style={style}
-        onClick={() => onSelect(project)}
+        className={`group cursor-pointer relative overflow-hidden ${className}`}
+        style={{
+          ...style,
+          // Prevent browser from recycling this element
+          contain: "layout style paint",
+          willChange: "transform",
+        }}
+        onClick={handleClick}
       >
-        {/* Stable background gradient - prevents flash when image loads */}
+        {/* Stable background - always visible */}
         <div
           className={`absolute inset-0 bg-gradient-to-br ${
             project.color || "from-amber-500 via-rose-500 to-violet-600"
           }`}
+          style={{ willChange: "transform", transform: "translateZ(0)" }}
         />
 
-        <div className="relative w-full h-full">
-          {project.images?.[0] && !imgError ? (
-            <>
-              {/* Use native img tag for mobile stability - prevents lazy loading issues */}
-              <img
-                src={project.images[0]}
-                alt={project.title}
-                className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${
-                  imgLoaded ? "opacity-100" : "opacity-0"
-                }`}
-                onLoad={() => setImgLoaded(true)}
-                onError={() => setImgError(true)}
-                draggable={false}
-              />
-              {/* Loading spinner while image loads */}
-              {!imgLoaded && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-6 h-6 border-2 border-white/30 border-t-white/80 rounded-full animate-spin" />
-                </div>
-              )}
-            </>
+        {/* Image layer */}
+        <div className="absolute inset-0">
+          {imageSrc && !localError && !hasError ? (
+            <StableImage
+              src={imageSrc}
+              alt={project.title}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              onError={handleError}
+              fallbackGradient={project.color}
+            />
           ) : (
             <MissingImageDisplay project={project} index={0} />
           )}
         </div>
 
-        {/* Hover overlay - CSS only */}
+        {/* Hover overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        {/* Hover content - CSS only */}
+        {/* Hover content */}
         <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
           <h3 className="text-lg font-bold mb-1">{project.title}</h3>
           <p className="text-sm text-white/80 line-clamp-2">
@@ -181,13 +297,10 @@ const ProjectCard = memo(
           </div>
         </div>
 
-        {/* Like button - CSS only hover */}
+        {/* Like button */}
         <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleLike(project.id);
-            }}
+            onClick={handleLikeClick}
             className={`p-2 rounded-full backdrop-blur-md transition-all ${
               isLiked
                 ? "bg-rose-500/80 text-white"
@@ -198,12 +311,22 @@ const ProjectCard = memo(
           </button>
         </div>
 
+        {/* Image count badge */}
         {project.images?.length > 1 && (
           <div className="absolute top-3 left-3 bg-black/50 backdrop-blur-md text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
             <Eye className="w-3 h-3" /> {project.images.length}
           </div>
         )}
       </div>
+    );
+  },
+  // Custom comparison - only re-render if these props change
+  (prevProps, nextProps) => {
+    return (
+      prevProps.project.id === nextProps.project.id &&
+      prevProps.isLiked === nextProps.isLiked &&
+      prevProps.hasError === nextProps.hasError &&
+      prevProps.className === nextProps.className
     );
   }
 );
@@ -548,130 +671,9 @@ const ProjectDetailView = ({
   );
 
   // ============================================================================
-  // SHOWCASE MODE (Combined Theater + Split)
+  // SHOWCASE MODE (Combined Theater + Split) - COMMENTED OUT
   // ============================================================================
-  const ShowcaseMode = () => (
-    <div className="absolute inset-0 flex flex-col md:flex-row bg-stone-900">
-      {/* Left side - Image + Thumbnails */}
-      <div className="flex-1 flex flex-col min-h-0">
-        {/* Main Image */}
-        <div
-          className="flex-1 relative flex items-center justify-center p-4 md:p-8 min-h-0"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          {/* Ambient glow */}
-          <div
-            className={`absolute inset-0 opacity-20 bg-gradient-to-br ${
-              project.color || "from-purple-500 to-pink-500"
-            } blur-3xl`}
-          />
-
-          {/* Image container */}
-          <div
-            className="relative w-full h-full max-h-[50vh] md:max-h-full transition-transform duration-300"
-            style={{ transform: `scale(${zoomLevel})` }}
-          >
-            <ImageDisplay
-              index={currentImageIndex}
-              className="rounded-lg"
-              objectFit="contain"
-            />
-          </div>
-
-          {/* Navigation arrows for images */}
-          {hasMultipleImages && (
-            <>
-              <button
-                type="button"
-                tabIndex={-1}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  navigatePrev();
-                }}
-                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-md p-3 md:p-4 rounded-full transition-all hover:scale-110 text-white"
-              >
-                <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
-              </button>
-              <button
-                type="button"
-                tabIndex={-1}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  navigateNext();
-                }}
-                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-md p-3 md:p-4 rounded-full transition-all hover:scale-110 text-white"
-              >
-                <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
-              </button>
-            </>
-          )}
-
-          {/* Counter */}
-          {hasMultipleImages && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-md px-4 py-2 rounded-full text-white/80 text-sm">
-              {currentImageIndex + 1} / {images.length}
-            </div>
-          )}
-        </div>
-
-        {/* Thumbnails strip */}
-        {hasMultipleImages && (
-          <div className="bg-black/40 backdrop-blur-md p-3 md:p-4 border-t border-white/10 flex-shrink-0">
-            <div className="flex gap-2 md:gap-3 justify-start md:justify-center overflow-x-auto pb-1">
-              {images.map((img, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  tabIndex={-1}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setCurrentImageIndex(idx);
-                    setZoomLevel(1);
-                  }}
-                  className={`relative flex-shrink-0 w-16 h-12 md:w-20 md:h-14 rounded-lg overflow-hidden transition-all ${
-                    idx === currentImageIndex
-                      ? "ring-2 ring-white scale-105"
-                      : "opacity-50 hover:opacity-80"
-                  }`}
-                >
-                  {img && !isImageError(idx) ? (
-                    <Image
-                      src={img}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      onError={() => handleImageError(project.id, idx)}
-                    />
-                  ) : (
-                    <div
-                      className={`w-full h-full bg-gradient-to-br ${
-                        project.color || "from-purple-500 to-pink-500"
-                      }`}
-                    />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Right side - Content Panel (hidden on mobile, shown as bottom sheet) */}
-      <div className="hidden md:block w-[400px] lg:w-[450px] border-l border-white/10 overflow-y-auto">
-        <ContentPanel />
-      </div>
-
-      {/* Mobile bottom sheet */}
-      <div className="md:hidden max-h-[45vh] overflow-y-auto border-t border-white/10">
-        <ContentPanel isMobile />
-      </div>
-    </div>
-  );
+  // const ShowcaseMode = () => ( ... );
 
   // ============================================================================
   // CAROUSEL MODE (Fixed 3D Carousel with smooth transitions)
@@ -1215,7 +1217,7 @@ const ProjectDetailView = ({
               <p className="text-gray-600 text-sm">{project.description}</p>
             </div>
 
-            {/* Large scrolling images - FIXED: Show complete images */}
+            {/* Large scrolling images */}
             {images.map((img, idx) => (
               <div
                 key={idx}
@@ -1241,11 +1243,10 @@ const ProjectDetailView = ({
                   <Maximize2 className="w-4 h-4 text-gray-700" />
                 </button>
 
-                {/* Image - FIXED: Use object-contain and proper aspect ratio */}
+                {/* Image */}
                 <div className="relative w-full bg-stone-50">
                   {img && !isImageError(idx) ? (
                     <div className="relative w-full flex items-center justify-center min-h-[300px] md:min-h-[400px]">
-                      {/* Using img tag for natural sizing in scroll view */}
                       <img
                         src={img}
                         alt={`${project.title} - ${idx + 1}`}
@@ -1346,8 +1347,6 @@ const ProjectDetailView = ({
 
   const renderDetailMode = () => {
     switch (detailMode) {
-      // case DETAIL_MODES.SHOWCASE:
-      //   return <ShowcaseMode />;
       case DETAIL_MODES.CAROUSEL:
         return <CarouselMode />;
       case DETAIL_MODES.SCROLL:
@@ -1512,6 +1511,15 @@ export default function Projects() {
   const [orbitalRotation, setOrbitalRotation] = useState(0);
   const [activeOrbitalProject, setActiveOrbitalProject] = useState(null);
 
+  // Preload all project images on mount
+  useEffect(() => {
+    projects.forEach((project) => {
+      if (project.images?.[0]) {
+        preloadImage(project.images[0]);
+      }
+    });
+  }, []);
+
   // Orbital animation - stop when modal is open
   useEffect(() => {
     if (currentLayout === LAYOUTS.ORBITAL && !selectedProject) {
@@ -1568,9 +1576,9 @@ export default function Projects() {
   }, []);
 
   // ============================================================================
-  // BENTO LAYOUT
+  // BENTO LAYOUT - Memoized
   // ============================================================================
-  const BentoLayout = () => {
+  const BentoLayout = useMemo(() => {
     const patterns = [
       "col-span-2 row-span-2",
       "col-span-1 row-span-1",
@@ -1579,39 +1587,43 @@ export default function Projects() {
       "col-span-2 row-span-1",
       "col-span-1 row-span-1",
     ];
+
     return (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[150px] md:auto-rows-[200px]">
         {filteredProjects.map((p, i) => (
           <ProjectCard
             key={p.id}
             project={p}
-            index={i}
             onSelect={handleSelectProject}
             onToggleLike={toggleLike}
+            onImageError={handleImageError}
             isLiked={likedProjects.has(p.id)}
             hasError={isImageError(p.id, 0)}
             className={`${
               patterns[i % patterns.length]
-            } rounded-2xl shadow-lg hover:shadow-2xl hover:z-10`}
+            } rounded-2xl shadow-lg hover:shadow-2xl hover:z-10 transition-all duration-500`}
           />
         ))}
       </div>
     );
-  };
+  }, [
+    filteredProjects,
+    likedProjects,
+    handleSelectProject,
+    toggleLike,
+    handleImageError,
+    isImageError,
+  ]);
 
   // ============================================================================
   // SCATTERED LAYOUT
   // ============================================================================
-  const ScatteredLayout = () => {
-    const patterns = useMemo(
-      () =>
-        filteredProjects.map((_, i) => ({
-          rotate: Math.sin(i * 2.5) * 12 - 6,
-          x: Math.sin(i * 1.3) * 15,
-          y: Math.cos(i * 1.7) * 10,
-        })),
-      [filteredProjects.length]
-    );
+  const ScatteredLayout = useMemo(() => {
+    const patterns = filteredProjects.map((_, i) => ({
+      rotate: Math.sin(i * 2.5) * 12 - 6,
+      x: Math.sin(i * 1.3) * 15,
+      y: Math.cos(i * 1.7) * 10,
+    }));
 
     return (
       <div className="relative bg-gradient-to-br from-stone-100 via-amber-50/50 to-stone-100 rounded-3xl p-6 md:p-8 min-h-[600px]">
@@ -1622,6 +1634,8 @@ export default function Projects() {
           {filteredProjects.map((p, i) => {
             const pat = patterns[i];
             const isLiked = likedProjects.has(p.id);
+            const hasError = isImageError(p.id, 0);
+
             return (
               <div
                 key={p.id}
@@ -1629,18 +1643,32 @@ export default function Projects() {
                 style={{
                   transform: `rotate(${pat.rotate}deg) translate(${pat.x}px, ${pat.y}px)`,
                   zIndex: i,
+                  contain: "layout style paint",
                 }}
                 onClick={() => handleSelectProject(p)}
               >
                 <div className="bg-white p-2 pb-10 shadow-xl hover:shadow-2xl transition-all duration-300 relative rounded-sm group-hover:rotate-0 group-hover:scale-105 group-hover:-translate-y-5 group-hover:z-50">
-                  <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-amber-100 to-rose-100">
-                    {p.images?.[0] && !isImageError(p.id, 0) ? (
-                      <img
+                  <div
+                    className="relative aspect-square overflow-hidden"
+                    style={{
+                      contain: "layout style paint",
+                      willChange: "transform",
+                    }}
+                  >
+                    {/* Background gradient */}
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-br ${
+                        p.color || "from-amber-100 to-rose-100"
+                      }`}
+                    />
+
+                    {p.images?.[0] && !hasError ? (
+                      <StableImage
                         src={p.images[0]}
                         alt={p.title}
                         className="absolute inset-0 w-full h-full object-cover"
                         onError={() => handleImageError(p.id, 0)}
-                        draggable={false}
+                        fallbackGradient={p.color}
                       />
                     ) : (
                       <MissingImageDisplay project={p} index={0} />
@@ -1662,20 +1690,21 @@ export default function Projects() {
         </div>
       </div>
     );
-  };
+  }, [
+    filteredProjects,
+    likedProjects,
+    handleSelectProject,
+    handleImageError,
+    isImageError,
+  ]);
 
   // ============================================================================
   // ORBITAL LAYOUT
   // ============================================================================
-  const OrbitalLayout = () => {
+  const OrbitalLayout = useMemo(() => {
     const centerProject = filteredProjects[0];
     const orbitingProjects = filteredProjects.slice(1, 7);
     const radius = 200;
-
-    const handleProjectClick = (project, e) => {
-      e.stopPropagation();
-      handleSelectProject(project);
-    };
 
     return (
       <div className="relative h-[600px] md:h-[650px] flex items-center justify-center bg-gradient-to-b from-stone-50 to-stone-100 rounded-3xl overflow-hidden">
@@ -1687,7 +1716,11 @@ export default function Projects() {
         {centerProject && (
           <div
             className="relative z-20 w-44 h-44 md:w-56 md:h-56 rounded-full overflow-hidden shadow-2xl ring-4 ring-white cursor-pointer hover:scale-105 transition-transform duration-300"
-            onClick={(e) => handleProjectClick(centerProject, e)}
+            style={{ contain: "layout style paint" }}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSelectProject(centerProject);
+            }}
           >
             <div
               className={`absolute inset-0 bg-gradient-to-br ${
@@ -1695,12 +1728,11 @@ export default function Projects() {
               }`}
             />
             {centerProject.images?.[0] && !isImageError(centerProject.id, 0) ? (
-              <img
+              <StableImage
                 src={centerProject.images[0]}
                 alt={centerProject.title}
                 className="absolute inset-0 w-full h-full object-cover"
                 onError={() => handleImageError(centerProject.id, 0)}
-                draggable={false}
               />
             ) : (
               <MissingImageDisplay project={centerProject} index={0} />
@@ -1738,8 +1770,12 @@ export default function Projects() {
                 top: "50%",
                 marginLeft: "-40px",
                 marginTop: "-40px",
+                contain: "layout style paint",
               }}
-              onClick={(e) => handleProjectClick(p, e)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSelectProject(p);
+              }}
               onMouseEnter={() =>
                 !selectedProject && setActiveOrbitalProject(p.id)
               }
@@ -1753,12 +1789,11 @@ export default function Projects() {
                 }`}
               />
               {p.images?.[0] && !isImageError(p.id, 0) ? (
-                <img
+                <StableImage
                   src={p.images[0]}
                   alt={p.title}
                   className="absolute inset-0 w-full h-full object-cover"
                   onError={() => handleImageError(p.id, 0)}
-                  draggable={false}
                 />
               ) : (
                 <MissingImageDisplay project={p} index={0} />
@@ -1802,18 +1837,27 @@ export default function Projects() {
         })}
       </div>
     );
-  };
+  }, [
+    filteredProjects,
+    likedProjects,
+    orbitalRotation,
+    activeOrbitalProject,
+    selectedProject,
+    handleSelectProject,
+    handleImageError,
+    isImageError,
+  ]);
 
   const renderLayout = () => {
     switch (currentLayout) {
       case LAYOUTS.BENTO:
-        return <BentoLayout />;
+        return BentoLayout;
       case LAYOUTS.SCATTERED:
-        return <ScatteredLayout />;
+        return ScatteredLayout;
       case LAYOUTS.ORBITAL:
-        return <OrbitalLayout />;
+        return OrbitalLayout;
       default:
-        return <BentoLayout />;
+        return BentoLayout;
     }
   };
 
