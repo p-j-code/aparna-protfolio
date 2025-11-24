@@ -349,14 +349,6 @@ const ProjectDetailView = ({
             />
             {likedProjects.has(project.id) ? "Liked" : "Like"}
           </button>
-          <button
-            type="button"
-            tabIndex={-1}
-            className="flex-1 py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 flex items-center justify-center gap-2"
-          >
-            <ExternalLink className="w-4 h-4" />
-            View Live
-          </button>
         </div>
 
         {/* Project Navigation */}
@@ -1008,14 +1000,6 @@ const ProjectDetailView = ({
                           }`}
                         />
                         {likedProjects.has(project.id) ? "Liked" : "Like"}
-                      </button>
-                      <button
-                        type="button"
-                        tabIndex={-1}
-                        className="px-4 py-2 bg-white/10 text-white hover:bg-white/20 rounded-full text-sm font-medium flex items-center gap-2"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        View Live
                       </button>
                     </div>
 
