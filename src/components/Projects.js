@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback, memo } from "react";
 import {
   ArrowRight,
   X,
@@ -61,6 +61,129 @@ const detailModeConfig = {
   [DETAIL_MODES.CAROUSEL]: { icon: Layers, name: "Carousel" },
   [DETAIL_MODES.SCROLL]: { icon: Grid, name: "Scroll" },
 };
+
+// ============================================================================
+// PLACEHOLDER COMPONENT - Moved outside to prevent re-creation
+// ============================================================================
+const MissingImageDisplay = memo(({ project, index = 0, className = "" }) => {
+  const icons = [Sparkles, Layers, Palette, Grid, ImageIcon];
+  const Icon = icons[index % icons.length];
+  return (
+    <div
+      className={`absolute inset-0 bg-gradient-to-br ${
+        project.color || "from-amber-500 via-rose-500 to-violet-600"
+      } overflow-hidden ${className}`}
+    >
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-1/4 left-1/4 w-24 h-24 bg-white rounded-full blur-3xl animate-pulse" />
+        <div
+          className="absolute bottom-1/4 right-1/4 w-32 h-32 bg-white rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "1s" }}
+        />
+      </div>
+      <div className="relative h-full flex flex-col items-center justify-center text-white">
+        <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 mb-2">
+          <Icon className="w-6 h-6" />
+        </div>
+        <span className="text-sm font-semibold text-center px-4">
+          {project.title}
+        </span>
+      </div>
+    </div>
+  );
+});
+MissingImageDisplay.displayName = "MissingImageDisplay";
+
+// ============================================================================
+// PROJECT CARD - Memoized with CSS-only hover effects
+// ============================================================================
+const ProjectCard = memo(
+  ({
+    project,
+    index,
+    style = {},
+    className = "",
+    onSelect,
+    onToggleLike,
+    isLiked,
+    hasError,
+  }) => {
+    return (
+      <div
+        className={`group cursor-pointer relative overflow-hidden transition-all duration-500 ${className}`}
+        style={style}
+        onClick={() => onSelect(project)}
+      >
+        <div className="relative w-full h-full">
+          {project.images?.[0] && !hasError ? (
+            <Image
+              src={project.images[0]}
+              alt={project.title}
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-110"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              loading="lazy"
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAIhAAAgEDAwUBAAAAAAAAAAAAAQIDAAQRBRIhBhMiMWFx/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAZEQADAAMAAAAAAAAAAAAAAAAAAQIRITH/2gAMAwEAAhEDEQA/AKOn9R6hY2ENnHHbGOJAi7o2JwBgZO7k/aqf+oaj/Eo/qUplTpLof//Z"
+            />
+          ) : (
+            <MissingImageDisplay project={project} index={0} />
+          )}
+        </div>
+
+        {/* Hover overlay - CSS only */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+        {/* Hover content - CSS only */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+          <h3 className="text-lg font-bold mb-1">{project.title}</h3>
+          <p className="text-sm text-white/80 line-clamp-2">
+            {project.description}
+          </p>
+          <div className="flex gap-2 mt-2 flex-wrap">
+            {project.tags.slice(0, 2).map((tag) => (
+              <span
+                key={tag}
+                className="text-xs bg-white/20 px-2 py-1 rounded-full"
+              >
+                {tag}
+              </span>
+            ))}
+            {project.images?.length > 1 && (
+              <span className="text-xs bg-white/20 px-2 py-1 rounded-full flex items-center gap-1">
+                <Eye className="w-3 h-3" /> {project.images.length}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Like button - CSS only hover */}
+        <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleLike(project.id);
+            }}
+            className={`p-2 rounded-full backdrop-blur-md transition-all ${
+              isLiked
+                ? "bg-rose-500/80 text-white"
+                : "bg-white/20 text-white hover:bg-white/30"
+            }`}
+          >
+            <Heart className={`w-4 h-4 ${isLiked ? "fill-current" : ""}`} />
+          </button>
+        </div>
+
+        {project.images?.length > 1 && (
+          <div className="absolute top-3 left-3 bg-black/50 backdrop-blur-md text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+            <Eye className="w-3 h-3" /> {project.images.length}
+          </div>
+        )}
+      </div>
+    );
+  }
+);
+ProjectCard.displayName = "ProjectCard";
 
 // ============================================================================
 // ENHANCED DETAIL VIEW COMPONENT
@@ -529,15 +652,6 @@ const ProjectDetailView = ({
   // ============================================================================
   // CAROUSEL MODE (Fixed 3D Carousel with smooth transitions)
   // ============================================================================
-  // ============================================================================
-  // CAROUSEL MODE (Fixed 3D Carousel with smooth transitions)
-  // ============================================================================
-  // ============================================================================
-  // CAROUSEL MODE (Fixed 3D Carousel with smooth transitions)
-  // ============================================================================
-  // ============================================================================
-  // CAROUSEL MODE (Fixed 3D Carousel with smooth transitions)
-  // ============================================================================
   const CarouselMode = () => {
     const [activeIndex, setActiveIndex] = useState(currentImageIndex);
     const [isDragging, setIsDragging] = useState(false);
@@ -705,7 +819,6 @@ const ProjectDetailView = ({
                   }`}
                   style={{
                     ...style,
-                    // Use max dimensions and let image determine actual size
                     width: "auto",
                     height: "auto",
                     maxWidth: showMobileInfo ? "65vw" : "80vw",
@@ -1053,6 +1166,7 @@ const ProjectDetailView = ({
       </div>
     );
   };
+
   // ============================================================================
   // SCROLL MODE (Fixed - No auto-scroll behavior)
   // ============================================================================
@@ -1372,7 +1486,6 @@ export default function Projects() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [currentLayout, setCurrentLayout] = useState(LAYOUTS.BENTO);
   const [orbitalRotation, setOrbitalRotation] = useState(0);
-  const [hoveredProject, setHoveredProject] = useState(null);
   const [activeOrbitalProject, setActiveOrbitalProject] = useState(null);
 
   // Orbital animation - stop when modal is open
@@ -1384,14 +1497,6 @@ export default function Projects() {
       return () => clearInterval(interval);
     }
   }, [currentLayout, selectedProject]);
-
-  // Clear hover states when modal opens
-  useEffect(() => {
-    if (selectedProject) {
-      setHoveredProject(null);
-      setActiveOrbitalProject(null);
-    }
-  }, [selectedProject]);
 
   const handleImageError = useCallback((projectId, imageIndex = 0) => {
     setImageErrors((prev) => ({
@@ -1426,8 +1531,7 @@ export default function Projects() {
     []
   );
 
-  const toggleLike = useCallback((projectId, e) => {
-    e?.stopPropagation();
+  const toggleLike = useCallback((projectId) => {
     setLikedProjects((prev) => {
       const newSet = new Set(prev);
       newSet.has(projectId) ? newSet.delete(projectId) : newSet.add(projectId);
@@ -1435,128 +1539,9 @@ export default function Projects() {
     });
   }, []);
 
-  // ============================================================================
-  // PLACEHOLDER COMPONENT
-  // ============================================================================
-  const MissingImageDisplay = ({ project, index = 0, className = "" }) => {
-    const icons = [Sparkles, Layers, Palette, Grid, ImageIcon];
-    const Icon = icons[index % icons.length];
-    return (
-      <div
-        className={`absolute inset-0 bg-gradient-to-br ${
-          project.color || "from-amber-500 via-rose-500 to-violet-600"
-        } overflow-hidden ${className}`}
-      >
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-1/4 left-1/4 w-24 h-24 bg-white rounded-full blur-3xl animate-pulse" />
-          <div
-            className="absolute bottom-1/4 right-1/4 w-32 h-32 bg-white rounded-full blur-3xl animate-pulse"
-            style={{ animationDelay: "1s" }}
-          />
-        </div>
-        <div className="relative h-full flex flex-col items-center justify-center text-white">
-          <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 mb-2">
-            <Icon className="w-6 h-6" />
-          </div>
-          <span className="text-sm font-semibold text-center px-4">
-            {project.title}
-          </span>
-        </div>
-      </div>
-    );
-  };
-
-  // ============================================================================
-  // PROJECT CARD
-  // ============================================================================
-  const ProjectCard = ({ project, index, style = {}, className = "" }) => {
-    const isHovered = hoveredProject === project.id;
-    const hasError = isImageError(project.id, 0);
-
-    return (
-      <div
-        className={`group cursor-pointer relative overflow-hidden transition-all duration-500 ${className}`}
-        style={style}
-        onClick={() => setSelectedProject(project)}
-        onMouseEnter={() => !selectedProject && setHoveredProject(project.id)}
-        onMouseLeave={() => !selectedProject && setHoveredProject(null)}
-      >
-        <div className="relative w-full h-full">
-          {project.images?.[0] && !hasError ? (
-            <Image
-              src={project.images[0]}
-              alt={project.title}
-              fill
-              className="object-cover transition-transform duration-700 group-hover:scale-110"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              onError={() => handleImageError(project.id, 0)}
-            />
-          ) : (
-            <MissingImageDisplay project={project} index={0} />
-          )}
-        </div>
-
-        <div
-          className={`absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-300 ${
-            isHovered ? "opacity-100" : "opacity-0"
-          }`}
-        />
-
-        <div
-          className={`absolute bottom-0 left-0 right-0 p-4 text-white transform transition-all duration-500 ${
-            isHovered ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-          }`}
-        >
-          <h3 className="text-lg font-bold mb-1">{project.title}</h3>
-          <p className="text-sm text-white/80 line-clamp-2">
-            {project.description}
-          </p>
-          <div className="flex gap-2 mt-2 flex-wrap">
-            {project.tags.slice(0, 2).map((tag) => (
-              <span
-                key={tag}
-                className="text-xs bg-white/20 px-2 py-1 rounded-full"
-              >
-                {tag}
-              </span>
-            ))}
-            {project.images?.length > 1 && (
-              <span className="text-xs bg-white/20 px-2 py-1 rounded-full flex items-center gap-1">
-                <Eye className="w-3 h-3" /> {project.images.length}
-              </span>
-            )}
-          </div>
-        </div>
-
-        <div
-          className={`absolute top-3 right-3 flex gap-2 transition-all duration-300 ${
-            isHovered ? "opacity-100" : "opacity-0"
-          }`}
-        >
-          <button
-            onClick={(e) => toggleLike(project.id, e)}
-            className={`p-2 rounded-full backdrop-blur-md transition-all ${
-              likedProjects.has(project.id)
-                ? "bg-rose-500/80 text-white"
-                : "bg-white/20 text-white hover:bg-white/30"
-            }`}
-          >
-            <Heart
-              className={`w-4 h-4 ${
-                likedProjects.has(project.id) ? "fill-current" : ""
-              }`}
-            />
-          </button>
-        </div>
-
-        {project.images?.length > 1 && (
-          <div className="absolute top-3 left-3 bg-black/50 backdrop-blur-md text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
-            <Eye className="w-3 h-3" /> {project.images.length}
-          </div>
-        )}
-      </div>
-    );
-  };
+  const handleSelectProject = useCallback((project) => {
+    setSelectedProject(project);
+  }, []);
 
   // ============================================================================
   // BENTO LAYOUT
@@ -1577,6 +1562,10 @@ export default function Projects() {
             key={p.id}
             project={p}
             index={i}
+            onSelect={handleSelectProject}
+            onToggleLike={toggleLike}
+            isLiked={likedProjects.has(p.id)}
+            hasError={isImageError(p.id, 0)}
             className={`${
               patterns[i % patterns.length]
             } rounded-2xl shadow-lg hover:shadow-2xl hover:z-10`}
@@ -1608,22 +1597,18 @@ export default function Projects() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8 relative">
           {filteredProjects.map((p, i) => {
             const pat = patterns[i];
-            const isHov = hoveredProject === p.id;
+            const isLiked = likedProjects.has(p.id);
             return (
               <div
                 key={p.id}
-                className="cursor-pointer transition-all duration-500"
+                className="cursor-pointer transition-all duration-500 group"
                 style={{
-                  transform: isHov
-                    ? "rotate(0deg) scale(1.08) translateY(-20px)"
-                    : `rotate(${pat.rotate}deg) translate(${pat.x}px, ${pat.y}px)`,
-                  zIndex: isHov ? 50 : i,
+                  transform: `rotate(${pat.rotate}deg) translate(${pat.x}px, ${pat.y}px)`,
+                  zIndex: i,
                 }}
-                onClick={() => setSelectedProject(p)}
-                onMouseEnter={() => !selectedProject && setHoveredProject(p.id)}
-                onMouseLeave={() => !selectedProject && setHoveredProject(null)}
+                onClick={() => handleSelectProject(p)}
               >
-                <div className="bg-white p-2 pb-10 shadow-xl hover:shadow-2xl transition-shadow relative rounded-sm">
+                <div className="bg-white p-2 pb-10 shadow-xl hover:shadow-2xl transition-all duration-300 relative rounded-sm group-hover:rotate-0 group-hover:scale-105 group-hover:-translate-y-5 group-hover:z-50">
                   <div className="relative aspect-square overflow-hidden">
                     {p.images?.[0] && !isImageError(p.id, 0) ? (
                       <Image
@@ -1632,6 +1617,7 @@ export default function Projects() {
                         fill
                         className="object-cover"
                         onError={() => handleImageError(p.id, 0)}
+                        loading="lazy"
                       />
                     ) : (
                       <MissingImageDisplay project={p} index={0} />
@@ -1642,7 +1628,7 @@ export default function Projects() {
                   </p>
                   <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-12 h-5 bg-amber-100/70 rotate-1 rounded-sm" />
                 </div>
-                {likedProjects.has(p.id) && (
+                {isLiked && (
                   <div className="absolute -top-2 -right-2 w-7 h-7 bg-rose-500 rounded-full flex items-center justify-center shadow-lg z-10">
                     <Heart className="w-3.5 h-3.5 text-white fill-current" />
                   </div>
@@ -1656,7 +1642,7 @@ export default function Projects() {
   };
 
   // ============================================================================
-  // ORBITAL LAYOUT (Improved with better click handling)
+  // ORBITAL LAYOUT
   // ============================================================================
   const OrbitalLayout = () => {
     const centerProject = filteredProjects[0];
@@ -1665,7 +1651,7 @@ export default function Projects() {
 
     const handleProjectClick = (project, e) => {
       e.stopPropagation();
-      setSelectedProject(project);
+      handleSelectProject(project);
     };
 
     return (
@@ -1687,6 +1673,7 @@ export default function Projects() {
                 fill
                 className="object-cover"
                 onError={() => handleImageError(centerProject.id, 0)}
+                loading="lazy"
               />
             ) : (
               <MissingImageDisplay project={centerProject} index={0} />
@@ -1740,6 +1727,7 @@ export default function Projects() {
                   fill
                   className="object-cover"
                   onError={() => handleImageError(p.id, 0)}
+                  loading="lazy"
                 />
               ) : (
                 <MissingImageDisplay project={p} index={0} />
@@ -1907,6 +1895,12 @@ export default function Projects() {
         .line-clamp-2 {
           display: -webkit-box;
           -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .line-clamp-3 {
+          display: -webkit-box;
+          -webkit-line-clamp: 3;
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
